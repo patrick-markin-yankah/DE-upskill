@@ -1,0 +1,37 @@
+version: 2
+
+models:
+  - name: fct_daily_trades
+    description: "One row per clean trade, including realized P&L in USD."
+    columns:
+      - name: order_id
+        data_tests: [not_null, unique]
+      - name: symbol
+        data_tests: [not_null]
+      - name: trade_date
+        data_tests: [not_null]
+      - name: quantity
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: false
+      - name: price
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: false
+      - name: side
+        data_tests:
+          - accepted_values:
+              values: ['BUY', 'SELL']
+  - name: dim_instrument
+    description: "One row per symbol in the price file, with static name and exchange from the seed."
+  - name: agg_portfolio_pnl
+    description: "One row per portfolio per date. total_pnl must match the sum of trade P&L."
+    columns:
+      - name: portfolio_id
+        data_tests: [not_null]
+      - name: pnl_date
+        data_tests: [not_null]

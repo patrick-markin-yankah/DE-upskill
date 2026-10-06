@@ -1,0 +1,12 @@
+urbangear_analytics:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: warehouse
+      port: 5432
+      user: dwh_user
+      password: dwh_pass
+      dbname: warehouse
+      schema: analytics
+      threads: 4

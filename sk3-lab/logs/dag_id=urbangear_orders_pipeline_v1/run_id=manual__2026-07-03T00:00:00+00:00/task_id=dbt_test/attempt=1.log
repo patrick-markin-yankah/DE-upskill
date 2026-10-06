@@ -1,0 +1,48 @@
+[2026-09-16T16:31:01.753+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2026-09-16T16:31:01.763+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: urbangear_orders_pipeline_v1.dbt_test manual__2026-07-03T00:00:00+00:00 [queued]>
+[2026-09-16T16:31:01.768+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: urbangear_orders_pipeline_v1.dbt_test manual__2026-07-03T00:00:00+00:00 [queued]>
+[2026-09-16T16:31:01.768+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 3
+[2026-09-16T16:31:01.775+0000] {taskinstance.py:2330} INFO - Executing <Task(BashOperator): dbt_test> on 2026-07-03 00:00:00+00:00
+[2026-09-16T16:31:01.778+0000] {standard_task_runner.py:64} INFO - Started process 13928 to run task
+[2026-09-16T16:31:01.781+0000] {standard_task_runner.py:90} INFO - Running: ['***', 'tasks', 'run', 'urbangear_orders_pipeline_v1', 'dbt_test', 'manual__2026-07-03T00:00:00+00:00', '--job-id', '85', '--raw', '--subdir', 'DAGS_FOLDER/urbangear_orders_pipeline.py', '--cfg-path', '/tmp/tmpaix2bske']
+[2026-09-16T16:31:01.783+0000] {standard_task_runner.py:91} INFO - Job 85: Subtask dbt_test
+[2026-09-16T16:31:01.819+0000] {task_command.py:426} INFO - Running <TaskInstance: urbangear_orders_pipeline_v1.dbt_test manual__2026-07-03T00:00:00+00:00 [running]> on host 37ecade69ad7
+[2026-09-16T16:31:01.877+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='data-eng' AIRFLOW_CTX_DAG_ID='urbangear_orders_pipeline_v1' AIRFLOW_CTX_TASK_ID='dbt_test' AIRFLOW_CTX_EXECUTION_DATE='2026-07-03T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-07-03T00:00:00+00:00'
+[2026-09-16T16:31:01.878+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2026-09-16T16:31:01.885+0000] {subprocess.py:63} INFO - Tmp dir root location: /tmp
+[2026-09-16T16:31:01.886+0000] {subprocess.py:75} INFO - Running command: ['/usr/bin/bash', '-c', 'cd /opt/***/dbt/urbangear_analytics && dbt test --profiles-dir /opt/***/dbt']
+[2026-09-16T16:31:01.893+0000] {subprocess.py:86} INFO - Output:
+[2026-09-16T16:31:02.965+0000] {subprocess.py:93} INFO - [0m16:31:02  Running with dbt=1.8.2
+[2026-09-16T16:31:03.088+0000] {subprocess.py:93} INFO - [0m16:31:03  Registered adapter: postgres=1.8.2
+[2026-09-16T16:31:03.325+0000] {subprocess.py:93} INFO - [0m16:31:03  Found 2 models, 8 data tests, 1 source, 413 macros
+[2026-09-16T16:31:03.327+0000] {subprocess.py:93} INFO - [0m16:31:03
+[2026-09-16T16:31:03.376+0000] {subprocess.py:93} INFO - [0m16:31:03  Concurrency: 4 threads (target='dev')
+[2026-09-16T16:31:03.377+0000] {subprocess.py:93} INFO - [0m16:31:03
+[2026-09-16T16:31:03.383+0000] {subprocess.py:93} INFO - [0m16:31:03  1 of 8 START test accepted_values_stg_orders_product_id__P100__P200__P300__P400  [RUN]
+[2026-09-16T16:31:03.384+0000] {subprocess.py:93} INFO - [0m16:31:03  2 of 8 START test assert_no_negative_revenue ................................... [RUN]
+[2026-09-16T16:31:03.384+0000] {subprocess.py:93} INFO - [0m16:31:03  3 of 8 START test not_null_fct_daily_product_sales_product_id .................. [RUN]
+[2026-09-16T16:31:03.385+0000] {subprocess.py:93} INFO - [0m16:31:03  4 of 8 START test not_null_fct_daily_product_sales_revenue ..................... [RUN]
+[2026-09-16T16:31:03.455+0000] {subprocess.py:93} INFO - [0m16:31:03  3 of 8 PASS not_null_fct_daily_product_sales_product_id ........................ [[32mPASS[0m in 0.07s]
+[2026-09-16T16:31:03.457+0000] {subprocess.py:93} INFO - [0m16:31:03  2 of 8 PASS assert_no_negative_revenue ......................................... [[32mPASS[0m in 0.07s]
+[2026-09-16T16:31:03.457+0000] {subprocess.py:93} INFO - [0m16:31:03  4 of 8 PASS not_null_fct_daily_product_sales_revenue ........................... [[32mPASS[0m in 0.07s]
+[2026-09-16T16:31:03.458+0000] {subprocess.py:93} INFO - [0m16:31:03  1 of 8 PASS accepted_values_stg_orders_product_id__P100__P200__P300__P400 ...... [[32mPASS[0m in 0.07s]
+[2026-09-16T16:31:03.461+0000] {subprocess.py:93} INFO - [0m16:31:03  5 of 8 START test not_null_stg_orders_order_id ................................. [RUN]
+[2026-09-16T16:31:03.462+0000] {subprocess.py:93} INFO - [0m16:31:03  6 of 8 START test not_null_stg_orders_product_id ............................... [RUN]
+[2026-09-16T16:31:03.462+0000] {subprocess.py:93} INFO - [0m16:31:03  7 of 8 START test not_null_stg_orders_quantity ................................. [RUN]
+[2026-09-16T16:31:03.463+0000] {subprocess.py:93} INFO - [0m16:31:03  8 of 8 START test unique_stg_orders_order_id ................................... [RUN]
+[2026-09-16T16:31:03.534+0000] {subprocess.py:93} INFO - [0m16:31:03  5 of 8 PASS not_null_stg_orders_order_id ....................................... [[32mPASS[0m in 0.07s]
+[2026-09-16T16:31:03.540+0000] {subprocess.py:93} INFO - [0m16:31:03  6 of 8 PASS not_null_stg_orders_product_id ..................................... [[32mPASS[0m in 0.08s]
+[2026-09-16T16:31:03.542+0000] {subprocess.py:93} INFO - [0m16:31:03  8 of 8 PASS unique_stg_orders_order_id ......................................... [[32mPASS[0m in 0.08s]
+[2026-09-16T16:31:03.543+0000] {subprocess.py:93} INFO - [0m16:31:03  7 of 8 PASS not_null_stg_orders_quantity ....................................... [[32mPASS[0m in 0.08s]
+[2026-09-16T16:31:03.554+0000] {subprocess.py:93} INFO - [0m16:31:03
+[2026-09-16T16:31:03.555+0000] {subprocess.py:93} INFO - [0m16:31:03  Finished running 8 data tests in 0 hours 0 minutes and 0.23 seconds (0.23s).
+[2026-09-16T16:31:03.575+0000] {subprocess.py:93} INFO - [0m16:31:03
+[2026-09-16T16:31:03.576+0000] {subprocess.py:93} INFO - [0m16:31:03  [32mCompleted successfully[0m
+[2026-09-16T16:31:03.576+0000] {subprocess.py:93} INFO - [0m16:31:03
+[2026-09-16T16:31:03.576+0000] {subprocess.py:93} INFO - [0m16:31:03  Done. PASS=8 WARN=0 ERROR=0 SKIP=0 TOTAL=8
+[2026-09-16T16:31:04.707+0000] {subprocess.py:97} INFO - Command exited with return code 0
+[2026-09-16T16:31:04.708+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2026-09-16T16:31:04.734+0000] {taskinstance.py:1206} INFO - Marking task as SUCCESS. dag_id=urbangear_orders_pipeline_v1, task_id=dbt_test, run_id=manual__2026-07-03T00:00:00+00:00, execution_date=20260703T000000, start_date=20260916T163101, end_date=20260916T163104
+[2026-09-16T16:31:04.753+0000] {local_task_job_runner.py:243} INFO - Task exited with return code 0
+[2026-09-16T16:31:04.775+0000] {taskinstance.py:3503} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2026-09-16T16:31:04.776+0000] {local_task_job_runner.py:222} INFO - ::endgroup::

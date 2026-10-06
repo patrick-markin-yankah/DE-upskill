@@ -1,0 +1,21 @@
+[2026-09-16T16:30:54.689+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2026-09-16T16:30:54.700+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: urbangear_orders_pipeline_v1.load_raw manual__2026-07-03T00:00:00+00:00 [queued]>
+[2026-09-16T16:30:54.704+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: urbangear_orders_pipeline_v1.load_raw manual__2026-07-03T00:00:00+00:00 [queued]>
+[2026-09-16T16:30:54.704+0000] {taskinstance.py:2306} INFO - Starting attempt 3 of 3
+[2026-09-16T16:30:54.709+0000] {taskinstance.py:2330} INFO - Executing <Task(BashOperator): load_raw> on 2026-07-03 00:00:00+00:00
+[2026-09-16T16:30:54.712+0000] {standard_task_runner.py:64} INFO - Started process 13886 to run task
+[2026-09-16T16:30:54.715+0000] {standard_task_runner.py:90} INFO - Running: ['***', 'tasks', 'run', 'urbangear_orders_pipeline_v1', 'load_raw', 'manual__2026-07-03T00:00:00+00:00', '--job-id', '83', '--raw', '--subdir', 'DAGS_FOLDER/urbangear_orders_pipeline.py', '--cfg-path', '/tmp/tmplvtwirhd']
+[2026-09-16T16:30:54.717+0000] {standard_task_runner.py:91} INFO - Job 83: Subtask load_raw
+[2026-09-16T16:30:54.754+0000] {task_command.py:426} INFO - Running <TaskInstance: urbangear_orders_pipeline_v1.load_raw manual__2026-07-03T00:00:00+00:00 [running]> on host 37ecade69ad7
+[2026-09-16T16:30:54.812+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='data-eng' AIRFLOW_CTX_DAG_ID='urbangear_orders_pipeline_v1' AIRFLOW_CTX_TASK_ID='load_raw' AIRFLOW_CTX_EXECUTION_DATE='2026-07-03T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='3' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-07-03T00:00:00+00:00'
+[2026-09-16T16:30:54.812+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2026-09-16T16:30:54.820+0000] {subprocess.py:63} INFO - Tmp dir root location: /tmp
+[2026-09-16T16:30:54.820+0000] {subprocess.py:75} INFO - Running command: ['/usr/bin/bash', '-c', 'python /opt/***/jobs/load_raw.py']
+[2026-09-16T16:30:54.828+0000] {subprocess.py:86} INFO - Output:
+[2026-09-16T16:30:55.803+0000] {subprocess.py:93} INFO - Loaded 2,452 rows into raw.orders
+[2026-09-16T16:30:55.914+0000] {subprocess.py:97} INFO - Command exited with return code 0
+[2026-09-16T16:30:55.915+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2026-09-16T16:30:55.932+0000] {taskinstance.py:1206} INFO - Marking task as SUCCESS. dag_id=urbangear_orders_pipeline_v1, task_id=load_raw, run_id=manual__2026-07-03T00:00:00+00:00, execution_date=20260703T000000, start_date=20260916T163054, end_date=20260916T163055
+[2026-09-16T16:30:55.945+0000] {local_task_job_runner.py:243} INFO - Task exited with return code 0
+[2026-09-16T16:30:55.968+0000] {taskinstance.py:3503} INFO - 1 downstream tasks scheduled from follow-on schedule check
+[2026-09-16T16:30:55.969+0000] {local_task_job_runner.py:222} INFO - ::endgroup::

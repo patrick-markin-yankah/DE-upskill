@@ -1,0 +1,35 @@
+{
+  "window_days": 30,
+  "widgets": [
+    {
+      "title": "Job duration",
+      "display": "line",
+      "y_label": "seconds",
+      "query": "SELECT run_date, duration_seconds FROM ops.pipeline_runs WHERE dag_id = 'fincore_daily_pipeline' AND run_date >= CURRENT_DATE - 30 ORDER BY run_date"
+    },
+    {
+      "title": "Record counts",
+      "display": "series",
+      "y_label": "trades",
+      "query": "SELECT run_date, total_trade_count AS total, clean_trade_count AS clean, rejected_trade_count AS rejected FROM ops.pipeline_runs WHERE dag_id = 'fincore_daily_pipeline' AND run_date >= CURRENT_DATE - 30 ORDER BY run_date"
+    },
+    {
+      "title": "Rejection rate",
+      "display": "line",
+      "y_label": "percent",
+      "query": "SELECT run_date, (reject_rate * 100) AS reject_percent FROM ops.pipeline_runs WHERE dag_id = 'fincore_daily_pipeline' AND run_date >= CURRENT_DATE - 30 ORDER BY run_date"
+    },
+    {
+      "title": "SLA compliance",
+      "display": "bar",
+      "y_label": "runs",
+      "query": "SELECT bucket.label, count(runs.run_date) AS runs FROM (VALUES ('within SLA', true), ('missed SLA', false)) AS bucket(label, flag) LEFT JOIN ops.pipeline_runs AS runs ON runs.within_sla = bucket.flag AND runs.dag_id = 'fincore_daily_pipeline' AND runs.run_date >= CURRENT_DATE - 30 GROUP BY bucket.label, bucket.flag ORDER BY bucket.flag DESC"
+    },
+    {
+      "title": "dbt pass rate",
+      "display": "rate",
+      "y_label": "percent",
+      "query": "SELECT run_date, CASE WHEN dbt_tests_passed THEN 100 ELSE 0 END AS pass_percent FROM ops.pipeline_runs WHERE dag_id = 'fincore_daily_pipeline' AND run_date >= CURRENT_DATE - 30 ORDER BY run_date"
+    }
+  ]
+}

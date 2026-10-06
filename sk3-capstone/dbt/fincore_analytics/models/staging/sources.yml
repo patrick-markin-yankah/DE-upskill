@@ -1,0 +1,22 @@
+version: 2
+
+sources:
+  - name: raw
+    description: "One date of Spark output, loaded by jobs/load_warehouse.py."
+    schema: raw
+    tables:
+      - name: trades
+        description: "Clean trades with a USD close and realized P&L."
+        loaded_at_field: loaded_at
+        freshness:
+          warn_after: {count: 8, period: hour}
+      - name: market_data
+        description: "Closes that passed the price rules, including the GBP rate."
+        loaded_at_field: loaded_at
+        freshness:
+          warn_after: {count: 8, period: hour}
+      - name: portfolio_pnl
+        description: "One row per portfolio for the loaded date."
+        loaded_at_field: loaded_at
+        freshness:
+          warn_after: {count: 8, period: hour}

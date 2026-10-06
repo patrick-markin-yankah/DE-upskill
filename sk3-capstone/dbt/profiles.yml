@@ -1,0 +1,12 @@
+fincore_analytics:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: warehouse
+      port: 5432
+      user: fincore
+      password: fincore
+      dbname: fincore
+      schema: analytics
+      threads: 4

@@ -1,0 +1,20 @@
+[2026-09-16T10:39:12.669+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2026-09-16T10:39:12.701+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: urbangear_hello_v1.print_logical_date manual__2026-09-16T10:39:11.940646+00:00 [queued]>
+[2026-09-16T10:39:12.708+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: urbangear_hello_v1.print_logical_date manual__2026-09-16T10:39:11.940646+00:00 [queued]>
+[2026-09-16T10:39:12.710+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 4
+[2026-09-16T10:39:12.716+0000] {taskinstance.py:2330} INFO - Executing <Task(BashOperator): print_logical_date> on 2026-09-16 10:39:11.940646+00:00
+[2026-09-16T10:39:12.719+0000] {standard_task_runner.py:64} INFO - Started process 2550 to run task
+[2026-09-16T10:39:12.722+0000] {standard_task_runner.py:90} INFO - Running: ['***', 'tasks', 'run', 'urbangear_hello_v1', 'print_logical_date', 'manual__2026-09-16T10:39:11.940646+00:00', '--job-id', '13', '--raw', '--subdir', 'DAGS_FOLDER/urbangear_hello.py', '--cfg-path', '/tmp/tmpf0wnhxmz']
+[2026-09-16T10:39:12.725+0000] {standard_task_runner.py:91} INFO - Job 13: Subtask print_logical_date
+[2026-09-16T10:39:12.768+0000] {task_command.py:426} INFO - Running <TaskInstance: urbangear_hello_v1.print_logical_date manual__2026-09-16T10:39:11.940646+00:00 [running]> on host 37ecade69ad7
+[2026-09-16T10:39:12.817+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='data-eng' AIRFLOW_CTX_DAG_ID='urbangear_hello_v1' AIRFLOW_CTX_TASK_ID='print_logical_date' AIRFLOW_CTX_EXECUTION_DATE='2026-09-16T10:39:11.940646+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-09-16T10:39:11.940646+00:00'
+[2026-09-16T10:39:12.817+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2026-09-16T10:39:12.824+0000] {subprocess.py:63} INFO - Tmp dir root location: /tmp
+[2026-09-16T10:39:12.825+0000] {subprocess.py:75} INFO - Running command: ['/usr/bin/bash', '-c', "echo 'processing data interval starting 2026-09-16'"]
+[2026-09-16T10:39:12.832+0000] {subprocess.py:86} INFO - Output:
+[2026-09-16T10:39:12.836+0000] {subprocess.py:93} INFO - processing data interval starting 2026-09-16
+[2026-09-16T10:39:12.836+0000] {subprocess.py:97} INFO - Command exited with return code 0
+[2026-09-16T10:39:12.837+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2026-09-16T10:39:12.858+0000] {taskinstance.py:1206} INFO - Marking task as SUCCESS. dag_id=urbangear_hello_v1, task_id=print_logical_date, run_id=manual__2026-09-16T10:39:11.940646+00:00, execution_date=20260916T103911, start_date=20260916T103912, end_date=20260916T103912
+[2026-09-16T10:39:12.898+0000] {local_task_job_runner.py:243} INFO - Task exited with return code 0
+[2026-09-16T10:39:12.911+0000] {local_task_job_runner.py:222} INFO - ::endgroup::

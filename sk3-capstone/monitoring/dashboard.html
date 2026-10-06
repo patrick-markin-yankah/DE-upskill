@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>FinCore pipeline</title>
+  <style>
+    body { font-family: Georgia, serif; color: #243140; margin: 2rem auto; max-width: 760px; }
+    h1 { font-size: 1.6rem; margin-bottom: 0.2rem; }
+    p.meta { color: #5c6b7a; }
+    section { margin-top: 2rem; }
+    table { border-collapse: collapse; width: 100%; margin-top: 0.5rem; }
+    th, td { border-bottom: 1px solid #e6ebf0; text-align: left; padding: 0.3rem 0.5rem; font-family: ui-monospace, monospace; font-size: 0.85rem; }
+    pre { white-space: pre-wrap; font-size: 0.8rem; }
+    svg { width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+  <h1>FinCore pipeline</h1>
+  <p class="meta">ops.pipeline_runs, last 30 days. Generated 2026-10-01 11:05:10 UTC.</p>
+  
+<section>
+  <h2>Job duration</h2>
+  
+  <svg viewBox="0 0 720 240" role="img">
+<line x1="48" y1="16" x2="48" y2="200" stroke="#c5cdd6"/>
+<line x1="48" y1="200" x2="700" y2="200" stroke="#c5cdd6"/>
+<line x1="48" y1="200.0" x2="700" y2="200.0" stroke="#e6ebf0"/>
+<text x="42" y="204.0" text-anchor="end" font-size="11" fill="#5c6b7a">0</text>
+<line x1="48" y1="112.0" x2="700" y2="112.0" stroke="#e6ebf0"/>
+<text x="42" y="116.0" text-anchor="end" font-size="11" fill="#5c6b7a">17.5</text>
+<line x1="48" y1="24.0" x2="700" y2="24.0" stroke="#e6ebf0"/>
+<text x="42" y="28.0" text-anchor="end" font-size="11" fill="#5c6b7a">35</text>
+<text x="16" y="120" font-size="11" fill="#5c6b7a" transform="rotate(-90 16 120)">seconds</text>
+<circle cx="48.0" cy="179.9" r="4" fill="#1f4e79"/>
+<circle cx="374.0" cy="200.0" r="4" fill="#1f4e79"/>
+<circle cx="700.0" cy="24.0" r="4" fill="#1f4e79"/>
+<polyline fill="none" stroke="#1f4e79" stroke-width="2" points="48.0,179.9 374.0,200.0 700.0,24.0"/>
+<text x="48.0" y="220" text-anchor="middle" font-size="11" fill="#5c6b7a">2026-09-21</text>
+<text x="374.0" y="220" text-anchor="middle" font-size="11" fill="#5c6b7a">2026-09-22</text>
+<text x="700.0" y="220" text-anchor="middle" font-size="11" fill="#5c6b7a">2026-09-27</text>
+</svg>
+  <table><thead><tr><th>run_date</th><th>duration_seconds</th></tr></thead><tbody><tr><td>2026-09-21</td><td>4</td></tr><tr><td>2026-09-22</td><td>0</td></tr><tr><td>2026-09-27</td><td>35</td></tr></tbody></table>
+  <details><summary>Query</summary><pre>SELECT run_date, duration_seconds FROM ops.pipeline_runs WHERE dag_id = &#x27;fincore_daily_pipeline&#x27; AND run_date &gt;= CURRENT_DATE - 30 ORDER BY run_date</pre></details>
+</section>
+
+<section>
+  <h2>Record counts</h2>
+  
+  <svg viewBox="0 0 720 240" role="img">
+<line x1="48" y1="16" x2="48" y2="200" stroke="#c5cdd6"/>
+<line x1="48" y1="200" x2="700" y2="200" stroke="#c5cdd6"/>
+<line x1="48" y1="200.0" x2="700" y2="200.0" stroke="#e6ebf0"/>
+<text x="42" y="204.0" text-anchor="end" font-size="11" fill="#5c6b7a">0</text>
+<line x1="48" y1="112.0" x2="700" y2="112.0" stroke="#e6ebf0"/>
+<text x="42" y="116.0" text-anchor="end" font-size="11" fill="#5c6b7a">250,000</text>
+<line x1="48" y1="24.0" x2="700" y2="24.0" stroke="#e6ebf0"/>
+<text x="42" y="28.0" text-anchor="end" font-size="11" fill="#5c6b7a">500,000</text>
+<text x="16" y="120" font-size="11" fill="#5c6b7a" transform="rotate(-90 16 120)">trades</text>
+<circle cx="48.0" cy="24.0" r="4" fill="#1f4e79"/>
+<circle cx="374.0" cy="199.6" r="4" fill="#1f4e79"/>
+<circle cx="700.0" cy="199.6" r="4" fill="#1f4e79"/>
+<polyline fill="none" stroke="#1f4e79" stroke-width="2" points="48.0,24.0 374.0,199.6 700.0,199.6"/>
+<circle cx="48.0" cy="25.8" r="4" fill="#2e7d32"/>
+<circle cx="374.0" cy="199.7" r="4" fill="#2e7d32"/>
+<circle cx="700.0" cy="199.7" r="4" fill="#2e7d32"/>
+<polyline fill="none" stroke="#2e7d32" stroke-width="2" points="48.0,25.8 374.0,199.7 700.0,199.7"/>
+<circle cx="48.0" cy="198.2" r="4" fill="#c62828"/>
+<circle cx="374.0" cy="200.0" r="4" fill="#c62828"/>
+<circle cx="700.0" cy="200.0" r="4" fill="#c62828"/>
+<polyline fill="none" stroke="#c62828" stroke-width="2" points="48.0,198.2 374.0,200.0 700.0,200.0"/>
+<text x="48.0" y="220" text-anchor="middle" font-size="11" fill="#5c6b7a">2026-09-21</text>
+<text x="374.0" y="220" text-anchor="middle" font-size="11" fill="#5c6b7a">2026-09-22</text>
+<text x="700.0" y="220" text-anchor="middle" font-size="11" fill="#5c6b7a">2026-09-27</text>
+<rect x="80" y="4" width="10" height="10" fill="#1f4e79"/>
+<text x="94" y="13" font-size="11" fill="#243140">total</text>
+<rect x="200" y="4" width="10" height="10" fill="#2e7d32"/>
+<text x="214" y="13" font-size="11" fill="#243140">clean</text>
+<rect x="320" y="4" width="10" height="10" fill="#c62828"/>
+<text x="334" y="13" font-size="11" fill="#243140">rejected</text>
+</svg>
+  <table><thead><tr><th>run_date</th><th>total</th><th>clean</th><th>rejected</th></tr></thead><tbody><tr><td>2026-09-21</td><td>500,000</td><td>494,988</td><td>5,000</td></tr><tr><td>2026-09-22</td><td>1,000</td><td>830</td><td>50</td></tr><tr><td>2026-09-27</td><td>1,000</td><td>978</td><td>10</td></tr></tbody></table>
+  <details><summary>Query</summary><pre>SELECT run_date, total_trade_count AS total, clean_trade_count AS clean, rejected_trade_count AS rejected FROM ops.pipeline_runs WHERE dag_id = &#x27;fincore_daily_pipeline&#x27; AND run_date &gt;= CURRENT_DATE - 30 ORDER BY run_date</pre></details>
+</section>
+
+<section>
+  <h2>Rejection rate</h2>
+  
+  <svg viewBox="0 0 720 240" role="img">
+<line x1="48" y1="16" x2="48" y2="200" stroke="#c5cdd6"/>
+<line x1="48" y1="200" x2="700" y2="200" stroke="#c5cdd6"/>
+<line x1="48" y1="200.0" x2="700" y2="200.0" stroke="#e6ebf0"/>
+<text x="42" y="204.0" text-anchor="end" font-size="11" fill="#5c6b7a">0</text>
+<line x1="48" y1="112.0" x2="700" y2="112.0" stroke="#e6ebf0"/>
+<text x="42" y="116.0" text-anchor="end" font-size="11" fill="#5c6b7a">2.5</text>
+<line x1="48" y1="24.0" x2="700" y2="24.0" stroke="#e6ebf0"/>
+<text x="42" y="28.0" text-anchor="end" font-size="11" fill="#5c6b7a">5</text>
+<text x="16" y="120" font-size="11" fill="#5c6b7a" transform="rotate(-90 16 120)">percent</text>
+<circle cx="48.0" cy="164.8" r="4" fill="#1f4e79"/>
+<circle cx="374.0" cy="24.0" r="4" fill="#1f4e79"/>
+<circle cx="700.0" cy="164.8" r="4" fill="#1f4e79"/>
+<polyline fill="none" stroke="#1f4e79" stroke-width="2" points="48.0,164.8 374.0,24.0 700.0,164.8"/>
+<text x="48.0" y="220" text-anchor="middle" font-size="11" fill="#5c6b7a">2026-09-21</text>
+<text x="374.0" y="220" text-anchor="middle" font-size="11" fill="#5c6b7a">2026-09-22</text>
+<text x="700.0" y="220" text-anchor="middle" font-size="11" fill="#5c6b7a">2026-09-27</text>
+</svg>
+  <table><thead><tr><th>run_date</th><th>reject_percent</th></tr></thead><tbody><tr><td>2026-09-21</td><td>1</td></tr><tr><td>2026-09-22</td><td>5</td></tr><tr><td>2026-09-27</td><td>1</td></tr></tbody></table>
+  <details><summary>Query</summary><pre>SELECT run_date, (reject_rate * 100) AS reject_percent FROM ops.pipeline_runs WHERE dag_id = &#x27;fincore_daily_pipeline&#x27; AND run_date &gt;= CURRENT_DATE - 30 ORDER BY run_date</pre></details>
+</section>
+
+<section>
+  <h2>SLA compliance</h2>
+  
+  <svg viewBox="0 0 720 240" role="img">
+<line x1="48" y1="16" x2="48" y2="200" stroke="#c5cdd6"/>
+<line x1="48" y1="200" x2="700" y2="200" stroke="#c5cdd6"/>
+<line x1="48" y1="200.0" x2="700" y2="200.0" stroke="#e6ebf0"/>
+<text x="42" y="204.0" text-anchor="end" font-size="11" fill="#5c6b7a">0</text>
+<line x1="48" y1="112.0" x2="700" y2="112.0" stroke="#e6ebf0"/>
+<text x="42" y="116.0" text-anchor="end" font-size="11" fill="#5c6b7a">1.5</text>
+<line x1="48" y1="24.0" x2="700" y2="24.0" stroke="#e6ebf0"/>
+<text x="42" y="28.0" text-anchor="end" font-size="11" fill="#5c6b7a">3</text>
+<text x="16" y="120" font-size="11" fill="#5c6b7a" transform="rotate(-90 16 120)">runs</text>
+<rect x="80.0" y="24.0" width="80" height="176.0" fill="#1f4e79"/>
+<text x="120.0" y="18.0" text-anchor="middle" font-size="12" fill="#243140">3</text>
+<text x="120.0" y="220" text-anchor="middle" font-size="11" fill="#5c6b7a">within SLA</text>
+<rect x="360.0" y="200.0" width="80" height="0.0" fill="#2e7d32"/>
+<text x="400.0" y="194.0" text-anchor="middle" font-size="12" fill="#243140">0</text>
+<text x="400.0" y="220" text-anchor="middle" font-size="11" fill="#5c6b7a">missed SLA</text>
+</svg>
+  <table><thead><tr><th>label</th><th>runs</th></tr></thead><tbody><tr><td>within SLA</td><td>3</td></tr><tr><td>missed SLA</td><td>0</td></tr></tbody></table>
+  <details><summary>Query</summary><pre>SELECT bucket.label, count(runs.run_date) AS runs FROM (VALUES (&#x27;within SLA&#x27;, true), (&#x27;missed SLA&#x27;, false)) AS bucket(label, flag) LEFT JOIN ops.pipeline_runs AS runs ON runs.within_sla = bucket.flag AND runs.dag_id = &#x27;fincore_daily_pipeline&#x27; AND runs.run_date &gt;= CURRENT_DATE - 30 GROUP BY bucket.label, bucket.flag ORDER BY bucket.flag DESC</pre></details>
+</section>
+
+<section>
+  <h2>dbt pass rate</h2>
+  <p>2 of 3 runs passed (66.66666666666666%).</p>
+  <svg viewBox="0 0 720 240" role="img">
+<line x1="48" y1="16" x2="48" y2="200" stroke="#c5cdd6"/>
+<line x1="48" y1="200" x2="700" y2="200" stroke="#c5cdd6"/>
+<line x1="48" y1="200.0" x2="700" y2="200.0" stroke="#e6ebf0"/>
+<text x="42" y="204.0" text-anchor="end" font-size="11" fill="#5c6b7a">0</text>
+<line x1="48" y1="112.0" x2="700" y2="112.0" stroke="#e6ebf0"/>
+<text x="42" y="116.0" text-anchor="end" font-size="11" fill="#5c6b7a">50</text>
+<line x1="48" y1="24.0" x2="700" y2="24.0" stroke="#e6ebf0"/>
+<text x="42" y="28.0" text-anchor="end" font-size="11" fill="#5c6b7a">100</text>
+<text x="16" y="120" font-size="11" fill="#5c6b7a" transform="rotate(-90 16 120)">percent</text>
+<circle cx="48.0" cy="24.0" r="4" fill="#1f4e79"/>
+<circle cx="374.0" cy="200.0" r="4" fill="#1f4e79"/>
+<circle cx="700.0" cy="24.0" r="4" fill="#1f4e79"/>
+<polyline fill="none" stroke="#1f4e79" stroke-width="2" points="48.0,24.0 374.0,200.0 700.0,24.0"/>
+<text x="48.0" y="220" text-anchor="middle" font-size="11" fill="#5c6b7a">2026-09-21</text>
+<text x="374.0" y="220" text-anchor="middle" font-size="11" fill="#5c6b7a">2026-09-22</text>
+<text x="700.0" y="220" text-anchor="middle" font-size="11" fill="#5c6b7a">2026-09-27</text>
+</svg>
+  <table><thead><tr><th>run_date</th><th>pass_percent</th></tr></thead><tbody><tr><td>2026-09-21</td><td>100</td></tr><tr><td>2026-09-22</td><td>0</td></tr><tr><td>2026-09-27</td><td>100</td></tr></tbody></table>
+  <details><summary>Query</summary><pre>SELECT run_date, CASE WHEN dbt_tests_passed THEN 100 ELSE 0 END AS pass_percent FROM ops.pipeline_runs WHERE dag_id = &#x27;fincore_daily_pipeline&#x27; AND run_date &gt;= CURRENT_DATE - 30 ORDER BY run_date</pre></details>
+</section>
+
+</body>
+</html>

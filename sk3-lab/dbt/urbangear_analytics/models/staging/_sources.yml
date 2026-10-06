@@ -1,0 +1,12 @@
+version: 2
+
+sources:
+  - name: raw
+    description: "Lab 05 Spark output, loaded from MinIO Parquet via jobs/load_raw.py"
+    schema: raw
+    tables:
+      - name: orders
+        description: "One row per UrbanGear order line (clean partition)"
+        loaded_at_field: order_ts
+        freshness:
+          warn_after: {count: 26, period: hour}

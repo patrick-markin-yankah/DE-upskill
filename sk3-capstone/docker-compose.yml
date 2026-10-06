@@ -1,0 +1,136 @@
+# FinCore local batch platform (SK-03 capstone)
+# Start:  docker compose up -d
+# Stop:   docker compose down          (keeps data)
+# Reset:  docker compose down -v       (DELETES all data volumes)
+
+name: fincore
+
+x-airflow-common: &airflow-common
+  build: ./docker
+  environment: &airflow-env
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-db/airflow
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "true"
+    AIRFLOW__CORE__DEFAULT_TIMEZONE: utc
+    # Shared by init, webserver, and scheduler so connection passwords decrypt.
+    # Local dev only. Not a production key.
+    AIRFLOW__CORE__FERNET_KEY: YW4PZr__J-AYgTVh6dcoQ_H7gqsLaOv40eSkCq59NUc=
+    AIRFLOW__WEBSERVER__SECRET_KEY: fincore-local-webserver-secret
+    # MinIO credentials — in production these come from a secrets manager.
+    MINIO_ENDPOINT: http://minio:9000
+    MINIO_ACCESS_KEY: minioadmin
+    MINIO_SECRET_KEY: minioadmin123
+    WAREHOUSE_HOST: warehouse
+    WAREHOUSE_PORT: "5432"
+    WAREHOUSE_DB: fincore
+    WAREHOUSE_USER: fincore
+    WAREHOUSE_PASSWORD: fincore
+    # Empty until .env has a webhook. Init skips the Slack connection in that case.
+    SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL:-}
+  volumes:
+    - ./dags:/opt/airflow/dags
+    - ./jobs:/opt/airflow/jobs
+    - ./dbt:/opt/airflow/dbt
+    - ./logs:/opt/airflow/logs
+    - ./plugins:/opt/airflow/plugins
+    - ./config:/opt/airflow/shared_config
+    - ./alerts:/opt/airflow/alerts
+    - ./monitoring:/opt/airflow/monitoring
+    - ./docker/init-airflow.sh:/opt/airflow/init-airflow.sh:ro
+    - ./docker/init_connections.py:/opt/airflow/init_connections.py:ro
+  depends_on:
+    airflow-db:
+      condition: service_healthy
+
+services:
+
+  # MinIO — S3-compatible object storage. API on 9100, console on 9101.
+  minio:
+    # minio/minio is no longer published on Docker Hub (source-only since Oct 2025).
+    # pgsty/minio is a drop-in community fork: same S3 API, env vars, and console ports.
+    image: pgsty/minio:latest
+    container_name: fincore-minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9100:9000"
+      - "9101:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Airflow metadata database. Stores DAG runs, task states, and connections.
+  airflow-db:
+    image: postgres:16
+    container_name: fincore-airflow-db
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - airflow-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Analytics warehouse. From the Mac: localhost:5434. From Airflow/dbt: warehouse:5432.
+  warehouse:
+    image: postgres:16
+    container_name: fincore-warehouse
+    environment:
+      POSTGRES_USER: fincore
+      POSTGRES_PASSWORD: fincore
+      POSTGRES_DB: fincore
+    ports:
+      - "5434:5432"
+    volumes:
+      - warehouse-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fincore -d fincore"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  airflow-init:
+    <<: *airflow-common
+    container_name: fincore-airflow-init
+    entrypoint: /bin/bash
+    command: ["/opt/airflow/init-airflow.sh"]
+    restart: "no"
+
+  airflow-webserver:
+    <<: *airflow-common
+    container_name: fincore-airflow-webserver
+    command: webserver
+    ports:
+      - "8082:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-scheduler:
+    <<: *airflow-common
+    container_name: fincore-airflow-scheduler
+    command: scheduler
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+
+volumes:
+  minio-data:
+  airflow-db-data:
+  warehouse-data:

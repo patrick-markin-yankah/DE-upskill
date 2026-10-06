@@ -1,0 +1,15 @@
+version: 2
+
+models:
+  - name: stg_orders
+    description: "UrbanGear order lines: typed and renamed, one row per order"
+    columns:
+      - name: order_id
+        tests: [not_null, unique]
+      - name: quantity
+        tests: [not_null]
+      - name: product_id
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['P100', 'P200', 'P300', 'P400']

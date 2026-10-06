@@ -1,0 +1,4 @@
+symbol,instrument_name,asset_class,exchange
+AAPL,Apple Inc.,equity,XNAS
+VOD,Vodafone Group Plc,equity,XLON
+GBP,British Pound,fx,

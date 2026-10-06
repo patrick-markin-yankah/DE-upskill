@@ -1,0 +1,15 @@
+version: 2
+
+models:
+  - name: stg_trades
+    description: "Typed trades. Quantity and price are not coalesced to zero."
+  - name: stg_market_data
+    description: "Typed closes. close_price already passed Spark's greater-than-zero rule."
+    columns:
+      - name: close_price
+        data_tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: false
+  - name: stg_portfolio_pnl
+    description: "Typed portfolio rollup. Marts read this view, not raw.portfolio_pnl."
