@@ -1,0 +1,86 @@
+store_id,store_name,district_id,city,state,latitude,longitude,open_date
+101,NorthStar Boston #101,1,Boston,MA,42.393843,-70.948875,2013-11-04
+102,NorthStar New York #102,2,New York,NY,40.582354,-74.089444,2020-11-29
+103,NorthStar Philadelphia #103,3,Philadelphia,PA,40.094028,-75.240507,2020-08-18
+104,NorthStar Hartford #104,1,Hartford,CT,41.659503,-72.608029,2011-09-30
+105,NorthStar Newark #105,2,Newark,NJ,40.657724,-74.179019,2019-04-07
+106,NorthStar Pittsburgh #106,3,Pittsburgh,PA,40.310089,-80.01807,2013-12-14
+107,NorthStar Providence #107,1,Providence,RI,41.725678,-71.472104,2009-01-05
+108,NorthStar Albany #108,2,Albany,NY,42.69845,-73.868471,2013-07-22
+109,NorthStar Philadelphia #109,3,Philadelphia,PA,39.849204,-75.146241,2021-06-28
+110,NorthStar Boston #110,1,Boston,MA,42.444642,-71.041988,2009-08-01
+111,NorthStar New York #111,2,New York,NY,40.74058,-74.063344,2011-12-01
+112,NorthStar Pittsburgh #112,3,Pittsburgh,PA,40.423671,-79.967243,2020-08-17
+113,NorthStar Hartford #113,1,Hartford,CT,41.884619,-72.628972,2012-11-27
+114,NorthStar Newark #114,2,Newark,NJ,40.801339,-74.046025,2010-01-24
+115,NorthStar Philadelphia #115,3,Philadelphia,PA,40.02177,-75.087592,2008-11-24
+116,NorthStar Providence #116,1,Providence,RI,41.820474,-71.304686,2008-09-25
+117,NorthStar Albany #117,2,Albany,NY,42.624138,-73.867519,2014-04-06
+118,NorthStar Pittsburgh #118,3,Pittsburgh,PA,40.526813,-80.000513,2021-03-05
+119,NorthStar Boston #119,1,Boston,MA,42.361158,-71.101408,2014-12-01
+120,NorthStar New York #120,2,New York,NY,40.828173,-74.098588,2011-12-17
+121,NorthStar Philadelphia #121,3,Philadelphia,PA,39.920915,-75.14654,2010-03-02
+122,NorthStar Hartford #122,1,Hartford,CT,41.78818,-72.626048,2019-09-19
+123,NorthStar Newark #123,2,Newark,NJ,40.636225,-74.028549,2012-08-05
+124,NorthStar Pittsburgh #124,3,Pittsburgh,PA,40.324868,-80.081877,2014-09-17
+125,NorthStar Atlanta #125,4,Atlanta,GA,33.695005,-84.319064,2011-02-11
+126,NorthStar Miami #126,5,Miami,FL,25.711245,-80.146019,2019-11-28
+127,NorthStar Charlotte #127,6,Charlotte,NC,35.268844,-80.718228,2012-08-04
+128,NorthStar Savannah #128,4,Savannah,GA,32.061331,-81.069966,2021-08-02
+129,NorthStar Orlando #129,5,Orlando,FL,28.476506,-81.449691,2009-03-23
+130,NorthStar Raleigh #130,6,Raleigh,NC,35.869506,-78.503084,2012-12-02
+131,NorthStar Atlanta #131,4,Atlanta,GA,33.741217,-84.484036,2021-07-10
+132,NorthStar Tampa #132,5,Tampa,FL,27.999461,-82.604915,2013-12-27
+133,NorthStar Nashville #133,6,Nashville,TN,36.218583,-86.668796,2008-08-21
+134,NorthStar Savannah #134,4,Savannah,GA,32.087877,-80.972123,2011-10-05
+135,NorthStar Miami #135,5,Miami,FL,25.718493,-80.187323,2008-09-18
+136,NorthStar Charlotte #136,6,Charlotte,NC,35.087512,-80.973125,2018-08-31
+137,NorthStar Atlanta #137,4,Atlanta,GA,33.791425,-84.332126,2009-11-20
+138,NorthStar Orlando #138,5,Orlando,FL,28.652137,-81.458279,2019-12-31
+139,NorthStar Raleigh #139,6,Raleigh,NC,35.767328,-78.567822,2009-10-06
+140,NorthStar Savannah #140,4,Savannah,GA,32.17271,-81.144674,2008-04-13
+141,NorthStar Tampa #141,5,Tampa,FL,28.049039,-82.60145,2009-09-16
+142,NorthStar Nashville #142,6,Nashville,TN,36.275075,-86.722772,2010-08-24
+143,NorthStar Atlanta #143,4,Atlanta,GA,33.85559,-84.363624,2010-02-10
+144,NorthStar Miami #144,5,Miami,FL,25.899681,-80.250456,2021-05-28
+145,NorthStar Charlotte #145,6,Charlotte,NC,35.296956,-80.951833,2020-08-13
+146,NorthStar Savannah #146,4,Savannah,GA,31.96615,-81.163179,2016-09-13
+147,NorthStar Chicago #147,7,Chicago,IL,41.960578,-87.546065,2016-05-11
+148,NorthStar Columbus #148,8,Columbus,OH,40.083649,-82.948421,2016-06-14
+149,NorthStar Minneapolis #149,9,Minneapolis,MN,44.920876,-93.363484,2008-02-11
+150,NorthStar Milwaukee #150,7,Milwaukee,WI,42.957399,-87.941289,2008-01-22
+151,NorthStar Indianapolis #151,8,Indianapolis,IN,39.771712,-86.251861,2020-05-22
+152,NorthStar St. Louis #152,9,St. Louis,MO,38.565948,-90.272446,2020-02-15
+153,NorthStar Detroit #153,7,Detroit,MI,42.202964,-83.107917,2014-08-27
+154,NorthStar Columbus #154,8,Columbus,OH,40.105091,-83.114315,2012-01-11
+155,NorthStar Kansas City #155,9,Kansas City,MO,39.040719,-94.716546,2010-01-13
+156,NorthStar Chicago #156,7,Chicago,IL,41.840599,-87.708777,2008-02-09
+157,NorthStar Indianapolis #157,8,Indianapolis,IN,39.900056,-86.189475,2018-12-11
+158,NorthStar Minneapolis #158,9,Minneapolis,MN,45.126931,-93.357023,2008-03-13
+159,NorthStar Milwaukee #159,7,Milwaukee,WI,43.110948,-87.98476,2012-12-25
+160,NorthStar Columbus #160,8,Columbus,OH,39.88316,-82.948114,2012-11-03
+161,NorthStar St. Louis #161,9,St. Louis,MO,38.516969,-90.254621,2015-01-27
+162,NorthStar Detroit #162,7,Detroit,MI,42.447906,-83.112265,2014-09-08
+163,NorthStar Indianapolis #163,8,Indianapolis,IN,39.902137,-86.114371,2011-01-06
+164,NorthStar Kansas City #164,9,Kansas City,MO,39.178065,-94.461075,2021-02-27
+165,NorthStar Chicago #165,7,Chicago,IL,41.845359,-87.696266,2008-07-15
+166,NorthStar Columbus #166,8,Columbus,OH,40.102846,-83.056656,2020-08-12
+167,NorthStar Minneapolis #167,9,Minneapolis,MN,45.090046,-93.391593,2013-09-05
+168,NorthStar Seattle #168,10,Seattle,WA,47.519943,-122.255852,2014-04-24
+169,NorthStar Los Angeles #169,11,Los Angeles,CA,34.044287,-118.30049,2011-01-21
+170,NorthStar Denver #170,12,Denver,CO,39.625955,-105.031025,2012-12-07
+171,NorthStar Portland #171,10,Portland,OR,45.543273,-122.739018,2021-04-12
+172,NorthStar San Diego #172,11,San Diego,CA,32.832605,-117.060083,2019-10-14
+173,NorthStar Phoenix #173,12,Phoenix,AZ,33.47712,-112.073063,2015-10-04
+174,NorthStar Seattle #174,10,Seattle,WA,47.625306,-122.248581,2014-12-05
+175,NorthStar San Jose #175,11,San Jose,CA,37.382825,-121.884986,2012-11-29
+176,NorthStar Salt Lake City #176,12,Salt Lake City,UT,40.707729,-111.970232,2015-08-16
+177,NorthStar Portland #177,10,Portland,OR,45.467297,-122.676961,2008-07-04
+178,NorthStar Los Angeles #178,11,Los Angeles,CA,34.07825,-118.282127,2013-06-12
+179,NorthStar Denver #179,12,Denver,CO,39.659699,-104.893188,2020-09-16
+180,NorthStar Seattle #180,10,Seattle,WA,47.594717,-122.317532,2008-12-06
+181,NorthStar San Diego #181,11,San Diego,CA,32.700765,-117.159533,2017-10-15
+182,NorthStar Phoenix #182,12,Phoenix,AZ,33.430055,-112.018002,2014-06-15
+183,NorthStar Portland #183,10,Portland,OR,45.650125,-122.812047,2018-08-15
+184,NorthStar San Jose #184,11,San Jose,CA,37.206024,-121.939808,2010-12-16
+185,NorthStar Salt Lake City #185,12,Salt Lake City,UT,40.71668,-111.85266,2016-09-11

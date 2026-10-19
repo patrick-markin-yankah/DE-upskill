@@ -1,0 +1,20 @@
+promotion_id,promotion_name,promotion_type,discount_pct,start_date,end_date
+0,No Promotion,None,0.00,2023-07-01,2026-06-30
+1,Back to School 2023,Seasonal,0.20,2023-08-10,2023-08-20
+2,Black Friday 2023,Holiday,0.15,2023-11-24,2023-12-03
+3,Holiday Gift Event 2023,Holiday,0.25,2023-12-10,2023-12-26
+4,New Year Clearance 2024,Clearance,0.25,2024-01-03,2024-01-16
+5,Spring Refresh 2024,Seasonal,0.25,2024-03-15,2024-03-28
+6,Summer Loyalty Days 2024,Loyalty,0.15,2024-06-05,2024-06-20
+7,Back to School 2024,Seasonal,0.20,2024-08-10,2024-08-20
+8,Black Friday 2024,Holiday,0.10,2024-11-24,2024-12-03
+9,Holiday Gift Event 2024,Holiday,0.15,2024-12-10,2024-12-19
+10,New Year Clearance 2025,Clearance,0.20,2025-01-03,2025-01-16
+11,Spring Refresh 2025,Seasonal,0.25,2025-03-15,2025-03-27
+12,Summer Loyalty Days 2025,Loyalty,0.25,2025-06-05,2025-06-14
+13,Back to School 2025,Seasonal,0.10,2025-08-10,2025-08-22
+14,Black Friday 2025,Holiday,0.10,2025-11-24,2025-12-09
+15,Holiday Gift Event 2025,Holiday,0.10,2025-12-10,2025-12-21
+16,New Year Clearance 2026,Clearance,0.25,2026-01-03,2026-01-12
+17,Spring Refresh 2026,Seasonal,0.10,2026-03-15,2026-03-28
+18,Summer Loyalty Days 2026,Loyalty,0.25,2026-06-05,2026-06-20
