@@ -1,0 +1,46 @@
+table DimDate
+	lineageTag: 70421c35-7df9-444b-9b2a-486441451861
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		isUnique
+		isKey
+		lineageTag: a4f142a9-5dbd-4906-b9ac-b97c9f030f06
+		sourceColumn: Date
+
+	column Year
+		dataType: int64
+		lineageTag: f4c453c7-e701-4675-aa28-140d0620b010
+		sourceColumn: Year
+
+	column MonthNumber
+		dataType: int64
+		lineageTag: a1e188af-a589-40b4-9a33-ad5fb842a020
+		sourceColumn: MonthNumber
+
+	column MonthName
+		dataType: string
+		lineageTag: 450ef90c-1ceb-41c8-8f07-ea55ec697941
+		sourceColumn: MonthName
+
+	column WeekdayName
+		dataType: string
+		lineageTag: 85db7796-5177-4998-944f-37e36e1168da
+		sourceColumn: WeekdayName
+
+	partition DimDate = m
+		mode: import
+		source =
+				let
+				    Start = Date.From(List.Min(ClassDay[ClassDate])),
+				    End = Date.From(List.Max(ClassDay[ClassDate])),
+				    Dates = List.Dates(Start, Duration.Days(End - Start) + 1, #duration(1, 0, 0, 0)),
+				    TableDates = Table.FromList(Dates, Splitter.SplitByNothing(), {"Date"}),
+				    Added = Table.AddColumn(TableDates, "Year", each Date.Year([Date]), Int64.Type),
+				    Month = Table.AddColumn(Added, "MonthNumber", each Date.Month([Date]), Int64.Type),
+				    MonthName = Table.AddColumn(Month, "MonthName", each Date.ToText([Date], [Format = "MMMM", Culture = "en-US"]), type text),
+				    Weekday = Table.AddColumn(MonthName, "WeekdayName", each Date.ToText([Date], [Format = "dddd", Culture = "en-US"]), type text),
+				    Typed = Table.TransformColumnTypes(Weekday, {{"Date", type datetime}})
+				in
+				    Typed

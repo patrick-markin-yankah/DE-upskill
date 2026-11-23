@@ -1,0 +1,58 @@
+relationship DimLearner_CohortKey_DimCohort_CohortKey
+	fromColumn: DimLearner.CohortKey
+	toColumn: DimCohort.CohortKey
+
+relationship DimLearner_TrackKey_DimTrack_TrackKey
+	fromColumn: DimLearner.TrackKey
+	toColumn: DimTrack.TrackKey
+
+relationship FactAttendance_Email_DimLearner_Email
+	fromColumn: FactAttendance.Email
+	toColumn: DimLearner.Email
+
+relationship FactParticipation_Email_DimLearner_Email
+	fromColumn: FactParticipation.Email
+	toColumn: DimLearner.Email
+
+relationship FactAssessment_Email_DimLearner_Email
+	fromColumn: FactAssessment.Email
+	toColumn: DimLearner.Email
+
+relationship FactOutcome_Email_DimLearner_Email
+	fromColumn: FactOutcome.Email
+	toColumn: DimLearner.Email
+
+relationship FactAttendance_ClassDate_DimDate_Date
+	joinOnDateBehavior: datePartOnly
+	fromColumn: FactAttendance.ClassDate
+	toColumn: DimDate.Date
+
+relationship FactParticipation_ClassDate_DimDate_Date
+	joinOnDateBehavior: datePartOnly
+	fromColumn: FactParticipation.ClassDate
+	toColumn: DimDate.Date
+
+relationship ClassDay_ClassDate_DimDate_Date
+	joinOnDateBehavior: datePartOnly
+	fromColumn: ClassDay.ClassDate
+	toColumn: DimDate.Date
+
+relationship FactAttendance_WeekKey_DimWeek_WeekKey
+	fromColumn: FactAttendance.WeekKey
+	toColumn: DimWeek.WeekKey
+
+relationship FactParticipation_WeekKey_DimWeek_WeekKey
+	fromColumn: FactParticipation.WeekKey
+	toColumn: DimWeek.WeekKey
+
+relationship FactAssessment_WeekKey_DimWeek_WeekKey
+	fromColumn: FactAssessment.WeekKey
+	toColumn: DimWeek.WeekKey
+
+relationship ClassDay_WeekKey_DimWeek_WeekKey
+	fromColumn: ClassDay.WeekKey
+	toColumn: DimWeek.WeekKey
+
+relationship WeekWindow_AsOfNumber_AsOfWeek_WeekNumber
+	fromColumn: WeekWindow.AsOfNumber
+	toColumn: AsOfWeek.WeekNumber

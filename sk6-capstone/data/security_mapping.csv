@@ -1,0 +1,4 @@
+user_email,org_id,access_level
+admin.org001@cloudhr.com,1,HR_ADMIN
+viewer.org001@cloudhr.com,1,HR_VIEWER
+viewer.org002@cloudhr.com,2,HR_VIEWER

@@ -1,0 +1,25 @@
+role Student
+	modelPermission: read
+	tablePermission DimLearner = DimLearner[Email] = USERPRINCIPALNAME ()
+
+	tablePermission DimCohort =
+			VAR SignedIn = USERPRINCIPALNAME ()
+			RETURN
+			    COUNTROWS (
+			        FILTER (
+			            DimLearner,
+			            DimLearner[Email] = SignedIn
+			                && DimLearner[CohortKey] = DimCohort[CohortKey]
+			        )
+			    ) > 0
+
+	tablePermission DimTrack =
+			VAR SignedIn = USERPRINCIPALNAME ()
+			RETURN
+			    COUNTROWS (
+			        FILTER (
+			            DimLearner,
+			            DimLearner[Email] = SignedIn
+			                && DimLearner[TrackKey] = DimTrack[TrackKey]
+			        )
+			    ) > 0

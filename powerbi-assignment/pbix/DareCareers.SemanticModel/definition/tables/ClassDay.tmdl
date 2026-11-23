@@ -1,0 +1,60 @@
+table ClassDay
+	lineageTag: 9bafe31b-07c3-4c40-bd60-b1966dda93a7
+
+	column CohortKey
+		dataType: string
+		lineageTag: 1c5f57d0-a86d-4882-9310-da7bf23ffb5c
+		sourceColumn: CohortKey
+
+	column TrackKey
+		dataType: string
+		lineageTag: 973b9045-a8ef-41df-8599-c1d04f160d76
+		sourceColumn: TrackKey
+
+	column ClassDate
+		dataType: dateTime
+		lineageTag: 7639bf15-1918-4f43-8c2a-08c8f3c5aa44
+		sourceColumn: ClassDate
+
+	column WeekNumber
+		dataType: int64
+		lineageTag: 955a931d-6595-402b-a205-d24b18367862
+		sourceColumn: WeekNumber
+
+	column WeekKey
+		dataType: string
+		lineageTag: bff70d9f-bd78-49d3-b34a-454b9027b615
+		sourceColumn: WeekKey
+
+	column MedianMinutes
+		dataType: double
+		lineageTag: dd7fdfc6-0162-41f2-a403-eaea55794f3c
+		sourceColumn: MedianMinutes
+
+	column ShortClass
+		dataType: boolean
+		lineageTag: 921dda2a-089e-4d76-b31d-572ea66c954a
+		sourceColumn: ShortClass
+
+	partition ClassDay = m
+		mode: import
+		source =
+				let
+				    Files = Table.SelectRows(FileIndex, each [Feed] = "Zoom Attendance" and Text.Lower([Extension]) = ".csv"),
+				    Distinct = Table.Distinct(Table.SelectColumns(Files, {"CohortKey", "TrackKey", "ClassDate", "WeekNumber"})),
+				    WithKey = Table.AddColumn(Distinct, "WeekKey", each fnWeekKey([CohortKey], [WeekNumber]), type text),
+				    DayKey = Table.TransformColumns(WithKey, {{"ClassDate", each if _ = null then null else Date.From(_), type date}}),
+				    Medians = Table.Group(
+				        Table.SelectRows(FactAttendance, each [Minutes] <> null),
+				        {"CohortKey", "TrackKey", "ClassDate"},
+				        {{"MedianMinutes", each List.Median([Minutes]), type number}}),
+				    MediansDate = Table.TransformColumns(Medians, {{"ClassDate", each if _ = null then null else Date.From(_), type date}}),
+				    Joined = Table.NestedJoin(DayKey, {"CohortKey", "TrackKey", "ClassDate"}, MediansDate, {"CohortKey", "TrackKey", "ClassDate"}, "M", JoinKind.LeftOuter),
+				    Expanded = Table.ExpandTableColumn(Joined, "M", {"MedianMinutes"}),
+				    Short = Table.AddColumn(Expanded, "ShortClass", each [MedianMinutes] <> null and [MedianMinutes] < 45, type logical),
+				    Typed = Table.TransformColumnTypes(Short, {
+				        {"CohortKey", type text}, {"TrackKey", type text}, {"ClassDate", type datetime},
+				        {"WeekNumber", Int64.Type}, {"WeekKey", type text}, {"MedianMinutes", type number},
+				        {"ShortClass", type logical}})
+				in
+				    Typed

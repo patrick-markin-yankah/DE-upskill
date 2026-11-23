@@ -1,0 +1,45 @@
+table DimWeek
+	lineageTag: 8d8850c6-605e-4616-aa44-dd8555bf9b67
+
+	column CohortKey
+		dataType: string
+		lineageTag: 8867b155-2e77-45d3-be08-2d48ce2ba401
+		sourceColumn: CohortKey
+
+	column WeekNumber
+		dataType: int64
+		lineageTag: 4e6c1fb9-82b2-4725-b399-0b9304e2fead
+		sourceColumn: WeekNumber
+
+	column WeekKey
+		dataType: string
+		isUnique
+		isKey
+		lineageTag: 100f3e33-c35f-4913-9fef-7e4b800e65d2
+		sourceColumn: WeekKey
+
+	column WeekStart
+		dataType: dateTime
+		lineageTag: 10fb3720-d40f-431d-b33d-fe8ed458f7ef
+		sourceColumn: WeekStart
+
+	column WeekEnd
+		dataType: dateTime
+		lineageTag: 8e984d5d-c12b-4c96-9198-b554a4690c83
+		sourceColumn: WeekEnd
+
+	partition DimWeek = m
+		mode: import
+		source =
+				let
+				    FromDays = Table.Group(ClassDay, {"CohortKey", "WeekNumber", "WeekKey"}, {
+				        {"WeekStart", each List.Min([ClassDate]), type datetime},
+				        {"WeekEnd", each List.Max([ClassDate]), type datetime}}),
+				    AssessWeeks = Table.Distinct(Table.SelectColumns(FactAssessment, {"CohortKey", "WeekNumber", "WeekKey"})),
+				    Missing = Table.NestedJoin(AssessWeeks, {"WeekKey"}, FromDays, {"WeekKey"}, "Have", JoinKind.LeftAnti),
+				    MissingRows = Table.AddColumn(
+				        Table.AddColumn(Table.SelectColumns(Missing, {"CohortKey", "WeekNumber", "WeekKey"}), "WeekStart", each null, type datetime),
+				        "WeekEnd", each null, type datetime),
+				    Combined = Table.Combine({FromDays, MissingRows})
+				in
+				    Combined

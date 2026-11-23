@@ -1,0 +1,51 @@
+table FactAssessment
+	lineageTag: a5eac0e7-9bed-4a13-b501-7f4b983ce0e2
+
+	column Email
+		dataType: string
+		isHidden
+		lineageTag: 6cacb708-3ed5-465e-bd60-564f831676b2
+		sourceColumn: Email
+
+	column CohortKey
+		dataType: string
+		lineageTag: 095e28bf-d7d1-48de-8e44-52874dfda39d
+		sourceColumn: CohortKey
+
+	column TrackKey
+		dataType: string
+		lineageTag: 324b085e-bb69-47ab-87a2-bb224a85e76d
+		sourceColumn: TrackKey
+
+	column WeekNumber
+		dataType: int64
+		lineageTag: df1f2363-3c4c-488b-9167-e05da55114bf
+		sourceColumn: WeekNumber
+
+	column WeekKey
+		dataType: string
+		lineageTag: 3fa92a00-3c15-4804-ab69-7e1f9e4625c1
+		sourceColumn: WeekKey
+
+	column Assessment
+		dataType: string
+		lineageTag: ba1c85ae-1fb6-4790-886c-0c3ded4f55b4
+		sourceColumn: Assessment
+
+	column Score
+		dataType: double
+		lineageTag: 516c63e7-5f1f-46b9-bdf3-e4dd4c34f28b
+		sourceColumn: Score
+
+	partition FactAssessment = m
+		mode: import
+		source =
+				let
+				    Rows = Table.SelectRows(AssessmentWide, each [Email] <> null and [WeekNo] <> null),
+				    Keep = Table.SelectColumns(Rows, {"Email", "CohortKey", "TrackKey", "WeekNo", "WeekKey", "Assessment", "ScoreNo"}),
+				    Renamed = Table.RenameColumns(Keep, {{"WeekNo", "WeekNumber"}, {"ScoreNo", "Score"}}),
+				    Typed = Table.TransformColumnTypes(Renamed, {
+				        {"Email", type text}, {"CohortKey", type text}, {"TrackKey", type text},
+				        {"WeekNumber", Int64.Type}, {"WeekKey", type text}, {"Assessment", type text}, {"Score", type number}})
+				in
+				    Typed

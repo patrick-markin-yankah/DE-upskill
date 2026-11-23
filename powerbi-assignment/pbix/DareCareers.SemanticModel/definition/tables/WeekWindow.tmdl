@@ -1,0 +1,28 @@
+table WeekWindow
+	lineageTag: c4a1e8b2-6d30-4f18-9a33-5e2b0c9d7f41
+
+	column AsOfNumber
+		dataType: int64
+		isHidden
+		lineageTag: d5b2f9c3-7e41-4052-8b44-6f3c1d0e8a52
+		summarizeBy: none
+		sourceColumn: AsOfNumber
+
+	column WeekNumber
+		dataType: int64
+		lineageTag: e6c3a0d4-8f52-4163-9c55-704d2e1f9b63
+		summarizeBy: none
+		sourceColumn: WeekNumber
+
+	partition WeekWindow = m
+		mode: import
+		source =
+				let
+				    WeekList = Table.Distinct(Table.SelectColumns(DimWeek, {"WeekNumber"})),
+				    AsOfList = Table.RenameColumns(WeekList, {{"WeekNumber", "AsOfNumber"}}),
+				    Added = Table.AddColumn(AsOfList, "WeekList", each WeekList),
+				    Expanded = Table.ExpandTableColumn(Added, "WeekList", {"WeekNumber"}),
+				    Filtered = Table.SelectRows(Expanded, each [WeekNumber] <= [AsOfNumber]),
+				    Typed = Table.TransformColumnTypes(Filtered, {{"AsOfNumber", Int64.Type}, {"WeekNumber", Int64.Type}})
+				in
+				    Typed

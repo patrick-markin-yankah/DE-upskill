@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "Dare Careers"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "81c2faf2-7c2c-4d5e-8423-c318f3c153c6"
+  }
+}

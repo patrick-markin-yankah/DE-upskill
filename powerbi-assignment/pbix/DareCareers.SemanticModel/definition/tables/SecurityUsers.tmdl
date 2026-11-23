@@ -1,0 +1,49 @@
+table SecurityUsers
+	isHidden
+	lineageTag: 8d2f0b31-5c74-4e29-9a66-2b3c4d5e6f71
+
+	column UserEmail
+		dataType: string
+		lineageTag: 9e301c42-6d85-4f30-8b77-3c4d5e6f7082
+		sourceColumn: UserEmail
+		summarizeBy: none
+
+	column Role
+		dataType: string
+		lineageTag: af412d53-7e96-4041-9c88-4d5e6f708193
+		sourceColumn: Role
+		summarizeBy: none
+
+	column CohortKey
+		dataType: string
+		lineageTag: b0523e64-8fa7-4152-8d99-5e6f708192a4
+		sourceColumn: CohortKey
+		summarizeBy: none
+
+	column TrackKey
+		dataType: string
+		lineageTag: c1634f75-90b8-4263-9eaa-6f708192a3b5
+		sourceColumn: TrackKey
+		summarizeBy: none
+
+	partition SecurityUsers = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(SecurityPath), true, true),
+				    Sheet = Source{[Item = "Sheet1", Kind = "Sheet"]}[Data],
+				    Renamed = Table.RenameColumns(
+				        Sheet,
+				        List.Transform(Table.ColumnNames(Sheet), each {_, Text.Lower(Text.Trim(_))}),
+				        MissingField.Ignore),
+				    Keep = Table.SelectColumns(Renamed, {"useremail", "role", "cohortkey", "trackkey"}, MissingField.UseNull),
+				    Typed = Table.RenameColumns(Keep, {
+				        {"useremail", "UserEmail"}, {"role", "Role"},
+				        {"cohortkey", "CohortKey"}, {"trackkey", "TrackKey"}}),
+				    Clean = Table.TransformColumns(Typed, {
+				        {"UserEmail", each if _ = null then null else Text.Lower(Text.Trim(Text.From(_))), type text},
+				        {"Role", each if _ = null then null else Text.Trim(Text.From(_)), type text},
+				        {"CohortKey", each if _ = null or Text.Trim(Text.From(_)) = "" then null else Text.Trim(Text.From(_)), type text},
+				        {"TrackKey", each if _ = null or Text.Trim(Text.From(_)) = "" then null else Text.Trim(Text.From(_)), type text}})
+				in
+				    Clean

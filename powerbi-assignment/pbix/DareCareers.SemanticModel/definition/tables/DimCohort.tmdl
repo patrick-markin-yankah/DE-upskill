@@ -1,0 +1,24 @@
+table DimCohort
+	lineageTag: f77be7a0-b3dd-4643-8bef-7b7970503738
+
+	column CohortKey
+		dataType: string
+		isUnique
+		isKey
+		lineageTag: d453e718-33c3-4d49-bb02-06bd895bd8f0
+		sourceColumn: CohortKey
+
+	column CohortLabel
+		dataType: string
+		lineageTag: 7a7503bd-f390-47bd-876e-46710a176104
+		sourceColumn: CohortLabel
+
+	partition DimCohort = m
+		mode: import
+		source =
+				let
+				    Dates = Table.Group(ClassDay, {"CohortKey"}, {{"FirstDay", each List.Min([ClassDate]), type date}}),
+				    Label = Table.AddColumn(Dates, "CohortLabel", each Date.ToText([FirstDay], [Format = "MMM yyyy", Culture = "en-US"]), type text),
+				    Keep = Table.SelectColumns(Label, {"CohortKey", "CohortLabel"})
+				in
+				    Keep

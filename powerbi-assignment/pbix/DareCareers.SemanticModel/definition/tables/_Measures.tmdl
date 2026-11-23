@@ -1,0 +1,1079 @@
+table _Measures
+	lineageTag: aada50e2-f9b6-4ffe-be7c-28dcbd226472
+
+	measure 'As Of Week Number' =
+			VAR SelectedWeek = SELECTEDVALUE ( AsOfWeek[WeekNumber] )
+			RETURN
+			    IF (
+			        ISBLANK ( SelectedWeek ),
+			        MAXX ( ALL ( AsOfWeek ), AsOfWeek[WeekNumber] ),
+			        SelectedWeek
+			    )
+		formatString: 0
+		displayFolder: As-of
+		lineageTag: 9a65f596-a821-4c92-9fc0-813dd04f0a24
+
+	measure 'Expected Days' =
+			VAR AsOfWeekNumber = [As Of Week Number]
+			RETURN
+			    CALCULATE (
+			        DISTINCTCOUNT ( ClassDay[ClassDate] ),
+			        TREATAS ( VALUES ( DimLearner[CohortKey] ), ClassDay[CohortKey] ),
+			        TREATAS ( VALUES ( DimLearner[TrackKey] ), ClassDay[TrackKey] ),
+			        ClassDay[WeekNumber] <= AsOfWeekNumber,
+			        REMOVEFILTERS ( DimLearner[Email] ),
+			        REMOVEFILTERS ( DimLearner[DisplayName] ),
+			        REMOVEFILTERS ( DimLearner[NameKey] )
+			    )
+		formatString: #,0
+		displayFolder: Activity
+		lineageTag: d61baa39-c95c-4b2c-87aa-1f579b178ded
+
+	measure 'Days Attended' =
+			VAR AsOfWeekNumber = [As Of Week Number]
+			RETURN
+			    CALCULATE (
+			        DISTINCTCOUNT ( FactAttendance[ClassDate] ),
+			        FactAttendance[Attended] = TRUE (),
+			        FactAttendance[WeekNumber] <= AsOfWeekNumber
+			    )
+		formatString: #,0
+		displayFolder: Activity
+		lineageTag: 45218344-9c5b-459f-b1a4-3dc98b3b8903
+
+	measure 'Attendance Rate' =
+			DIVIDE (
+			    SUMX ( DimLearner, [Days Attended] ),
+			    SUMX ( DimLearner, [Expected Days] )
+			)
+		formatString: 0.0%
+		displayFolder: Activity
+		lineageTag: 8ca2fd24-d8fc-4c75-8406-8dcb73d0c645
+
+	measure 'Days Participated' =
+			VAR AsOfWeekNumber = [As Of Week Number]
+			RETURN
+			    CALCULATE (
+			        DISTINCTCOUNT ( FactParticipation[ClassDate] ),
+			        FactParticipation[WeekNumber] <= AsOfWeekNumber
+			    )
+		formatString: #,0
+		displayFolder: Activity
+		lineageTag: edb847b5-5247-49af-87e9-95f369a40e66
+
+	measure 'Participation Rate' =
+			DIVIDE (
+			    SUMX ( DimLearner, [Days Participated] ),
+			    SUMX ( DimLearner, [Expected Days] )
+			)
+		formatString: 0.0%
+		displayFolder: Activity
+		lineageTag: 7c46575a-5913-4b4d-a297-d3cfa72af715
+
+	measure 'Average Lab' =
+			VAR AsOfWeekNumber = [As Of Week Number]
+			RETURN
+			    CALCULATE (
+			        AVERAGE ( FactAssessment[Score] ),
+			        FactAssessment[Assessment] = "Lab",
+			        FactAssessment[WeekNumber] <= AsOfWeekNumber
+			    )
+		formatString: 0.0
+		displayFolder: Activity
+		lineageTag: 9cfa0e0b-2222-4b27-a8f5-742467243059
+
+	measure 'Average Quiz' =
+			VAR AsOfWeekNumber = [As Of Week Number]
+			RETURN
+			    CALCULATE (
+			        AVERAGE ( FactAssessment[Score] ),
+			        FactAssessment[Assessment] = "Quiz",
+			        FactAssessment[WeekNumber] <= AsOfWeekNumber
+			    )
+		formatString: 0.0
+		displayFolder: Activity
+		lineageTag: fdffc633-d975-4baa-8f76-d906ed6b180c
+
+	measure 'Missed Assessments' =
+			VAR AsOfWeekNumber = [As Of Week Number]
+			VAR Weeks =
+			    CALCULATETABLE (
+			        SUMMARIZE ( FactAssessment, FactAssessment[Assessment], FactAssessment[WeekNumber] ),
+			        REMOVEFILTERS ( DimLearner ),
+			        FactAssessment[WeekNumber] <= AsOfWeekNumber
+			    )
+			VAR Submitted =
+			    CALCULATETABLE (
+			        SUMMARIZE ( FactAssessment, FactAssessment[Assessment], FactAssessment[WeekNumber] ),
+			        FactAssessment[WeekNumber] <= AsOfWeekNumber,
+			        NOT ISBLANK ( FactAssessment[Score] )
+			    )
+			RETURN
+			    COUNTROWS ( Weeks ) - COUNTROWS ( Submitted )
+		formatString: #,0
+		displayFolder: Activity
+		lineageTag: d51a5a34-4793-4d95-8024-13b88ad36b54
+
+	measure Learners =
+			CALCULATE (
+			    DISTINCTCOUNT ( DimLearner[Email] ),
+			    TREATAS ( VALUES ( DimCohort[CohortKey] ), DimLearner[CohortKey] ),
+			    TREATAS ( VALUES ( DimTrack[TrackKey] ), DimLearner[TrackKey] )
+			)
+		formatString: #,0
+		displayFolder: Outcomes
+		lineageTag: 207fcd78-04cd-426d-a073-da8b829defad
+
+	measure Graduates = CALCULATE ( DISTINCTCOUNT ( FactOutcome[Email] ), FactOutcome[Graduated] = TRUE () )
+		formatString: #,0
+		displayFolder: Outcomes
+		lineageTag: 8425dd52-39d3-4424-88c9-18e872c9b17a
+
+	measure Non-Graduates = CALCULATE ( DISTINCTCOUNT ( FactOutcome[Email] ), FactOutcome[Graduated] = FALSE () )
+		formatString: #,0
+		displayFolder: Outcomes
+		lineageTag: 41fd41b1-b637-45af-8409-24fe50b39168
+
+	measure 'Certified Learners' = CALCULATE ( DISTINCTCOUNT ( FactOutcome[Email] ), FactOutcome[Certified] = TRUE () )
+		formatString: #,0
+		displayFolder: Outcomes
+		lineageTag: 532bc7de-df61-4868-9c27-0b355e44a451
+
+	measure 'Graduation Rate' = DIVIDE ( [Graduates], [Learners] )
+		formatString: 0.0%
+		displayFolder: Outcomes
+		lineageTag: c1a90159-7e80-4fd8-8049-8af7e22ddd08
+
+	measure 'Non-Graduation Rate' = DIVIDE ( [Non-Graduates], [Learners] )
+		formatString: 0.0%
+		displayFolder: Outcomes
+		lineageTag: 9c1c9751-9b6e-4f63-b6dd-db66da02c497
+
+	measure 'Certification Rate' = DIVIDE ( [Certified Learners], [Learners] )
+		formatString: 0.0%
+		displayFolder: Outcomes
+		lineageTag: 58e98def-8284-4aad-ad4e-a60af25af532
+
+	measure 'Attendance Bar' = 0.6
+		formatString: 0.0%
+		displayFolder: Monday
+		lineageTag: 740ecdea-0f13-4c9d-b3e3-2dc252af5471
+
+	measure 'Score Bar' = 50
+		formatString: 0
+		displayFolder: Monday
+		lineageTag: 93c304f8-104b-4a65-a7dc-958a955cffb9
+
+	measure 'Low Score Bar' = 30
+		formatString: 0
+		displayFolder: Monday
+		lineageTag: 4c8a1e2b-7d6f-4a91-9c33-2b8e5f0a1d47
+
+	measure 'At Risk' =
+			VAR ThinAttendance = NOT ISBLANK ( [Attendance Rate] ) && [Attendance Rate] < [Attendance Bar]
+			VAR WeakLab = NOT ISBLANK ( [Average Lab] ) && [Average Lab] < [Score Bar]
+			VAR WeakQuiz = NOT ISBLANK ( [Average Quiz] ) && [Average Quiz] < [Score Bar]
+			VAR InScope = NOT ISBLANK ( [Expected Days] ) && [Expected Days] > 0
+			RETURN
+			    IF ( ( InScope && ThinAttendance ) || ( WeakLab && WeakQuiz ), 1, 0 )
+		formatString: 0
+		displayFolder: Monday
+		lineageTag: 1cef6283-7b3f-4c05-9bd5-564805b6a249
+
+	measure 'At Risk Count' = SUMX ( DimLearner, [At Risk] )
+		formatString: #,0
+		displayFolder: Monday
+		lineageTag: b73ce883-9e63-41e1-b1aa-f5a6a8c57bc3
+
+	measure 'To Call' = COUNTROWS ( FILTER ( DimLearner, [First Call Candidate] = 1 ) )
+		formatString: #,0
+		displayFolder: Monday
+		lineageTag: 6a1d8e44-2c7b-4f19-8a55-0d9e3b7c1f28
+
+	measure 'Flag Reason' =
+			VAR AttendedDays = [Days Attended]
+			VAR Expected = [Expected Days]
+			VAR ParticipatedDays = [Days Participated]
+			VAR LabScore = [Average Lab]
+			VAR QuizScore = [Average Quiz]
+			VAR LabNow = [Lab This Week]
+			VAR QuizNow = [Quiz This Week]
+			VAR WeakLab = NOT ISBLANK ( LabScore ) && LabScore < [Score Bar]
+			VAR WeakQuiz = NOT ISBLANK ( QuizScore ) && QuizScore < [Score Bar]
+			VAR OneMean = WeakLab || WeakQuiz
+			VAR BothMeans = WeakLab && WeakQuiz
+			VAR ThinAttendance = NOT ISBLANK ( [Attendance Rate] ) && [Attendance Rate] < [Attendance Bar]
+			VAR Because =
+			    SWITCH (
+			        TRUE (),
+			        WeakLab && WeakQuiz, "mean lab and quiz are under 50",
+			        WeakLab, "mean lab is under 50",
+			        WeakQuiz, "mean quiz is under 50",
+			        "the means are not under 50"
+			    )
+			VAR InScope = NOT ISBLANK ( Expected ) && Expected > 0
+			VAR Opening =
+			    SWITCH (
+			        TRUE (),
+			        InScope && ThinAttendance && OneMean, "Attendance is under 60% and " & Because & ". ",
+			        InScope && ThinAttendance, "Attendance is under 60%. ",
+			        BothMeans, "The mean lab and quiz are under 50. ",
+			        "Not flagged. "
+			    )
+			RETURN
+			    Opening
+			        & "Attended " & AttendedDays & " of " & Expected
+			        & " days, participated " & ParticipatedDays
+			        & ", average lab " & FORMAT ( LabScore, "0" )
+			        & ", average quiz " & FORMAT ( QuizScore, "0" )
+			        & ", lab this week " & FORMAT ( LabNow, "0" )
+			        & ", quiz this week " & FORMAT ( QuizNow, "0" )
+			        & "."
+		displayFolder: Monday
+		lineageTag: 3d54d1d7-b7ec-45c7-a330-06bf7c3e68cf
+
+	measure 'Flagged Non-Graduates' =
+			COUNTROWS (
+			    FILTER (
+			        DimLearner,
+			        [At Risk] = 1
+			            && CALCULATE ( SELECTEDVALUE ( FactOutcome[Graduated] ) ) = FALSE ()
+			    )
+			)
+		formatString: #,0
+		displayFolder: Back-test
+		lineageTag: 7c1d9296-8c10-41db-bb46-e6d9baadce7e
+
+	measure 'Missed Non-Graduates' =
+			COUNTROWS (
+			    FILTER (
+			        DimLearner,
+			        [At Risk] = 0
+			            && CALCULATE ( SELECTEDVALUE ( FactOutcome[Graduated] ) ) = FALSE ()
+			    )
+			)
+		formatString: #,0
+		displayFolder: Back-test
+		lineageTag: f96f5dbb-3d45-4ca9-ace0-1a8384c635eb
+
+	measure 'Attendance Rate Gap' =
+			VAR AsOfWeekNumber = [As Of Week Number]
+			VAR ThisWeek = SELECTEDVALUE ( DimWeek[WeekNumber] )
+			VAR ThisRate = [Attendance Rate]
+			VAR OtherRate =
+			    CALCULATE (
+			        [Attendance Rate],
+			        DimWeek[WeekNumber] <= AsOfWeekNumber,
+			        DimWeek[WeekNumber] <> ThisWeek
+			    )
+			RETURN
+			    IF (
+			        ISBLANK ( ThisWeek )
+			            || ThisWeek > AsOfWeekNumber
+			            || ISBLANK ( ThisRate )
+			            || ISBLANK ( OtherRate ),
+			        BLANK (),
+			        ThisRate - OtherRate
+			    )
+		formatString: 0.0%
+		displayFolder: Activity
+		lineageTag: d56174b0-34df-4732-8e09-b7b27fa967d9
+
+	measure 'Quiz Average Gap' =
+			VAR AsOfWeekNumber = [As Of Week Number]
+			VAR ThisWeek = SELECTEDVALUE ( DimWeek[WeekNumber] )
+			VAR ThisQuiz = [Average Quiz]
+			VAR OtherQuiz =
+			    CALCULATE (
+			        [Average Quiz],
+			        DimWeek[WeekNumber] <= AsOfWeekNumber,
+			        DimWeek[WeekNumber] <> ThisWeek
+			    )
+			RETURN
+			    IF (
+			        ISBLANK ( ThisWeek )
+			            || ThisWeek > AsOfWeekNumber
+			            || ISBLANK ( ThisQuiz )
+			            || ISBLANK ( OtherQuiz ),
+			        BLANK (),
+			        ThisQuiz - OtherQuiz
+			    )
+		formatString: 0.0
+		displayFolder: Activity
+		lineageTag: 051c6e3d-103c-4d86-bc13-03a5866b56c0
+
+	measure 'Unusual Week' =
+			VAR AsOfWeekNumber = [As Of Week Number]
+			VAR ThisWeek = SELECTEDVALUE ( DimWeek[WeekNumber] )
+			VAR AttendanceGap = 0.15
+			VAR QuizGap = 10
+			RETURN
+			    IF (
+			        ISBLANK ( ThisWeek ) || ThisWeek > AsOfWeekNumber,
+			        0,
+			        IF (
+			            (
+			                NOT ISBLANK ( [Attendance Rate Gap] )
+			                    && [Attendance Rate Gap] < -AttendanceGap
+			            )
+			                || (
+			                    NOT ISBLANK ( [Quiz Average Gap] )
+			                        && [Quiz Average Gap] < -QuizGap
+			                ),
+			            1,
+			            0
+			        )
+			    )
+		formatString: 0
+		displayFolder: Activity
+		lineageTag: f67936e1-5dd3-4402-ab22-21614f31f53b
+
+	measure 'Quiz Gap Ink' =
+			IF ( NOT ISBLANK ( [Quiz Average Gap] ) && [Quiz Average Gap] < 0, "#8C3A32", "#1C2430" )
+		displayFolder: Activity
+		lineageTag: b1c2d3e4-5f60-4711-a829-0c1d2e3f4a5b
+
+	measure 'Attendance Gap Ink' =
+			IF ( NOT ISBLANK ( [Attendance Rate Gap] ) && [Attendance Rate Gap] < 0, "#8C3A32", "#1C2430" )
+		displayFolder: Activity
+		lineageTag: c2d3e4f5-6071-4822-b93a-1d2e3f405b6c
+
+	measure 'At Risk Prior Week' =
+			VAR PriorWeek = [As Of Week Number] - 1
+			RETURN
+			    IF ( PriorWeek < 1, 0, CALCULATE ( [At Risk], AsOfWeek[WeekNumber] = PriorWeek ) )
+		formatString: 0
+		displayFolder: Monday
+		lineageTag: c2b180d9-8d8f-401c-8753-59a64248dbca
+
+	measure 'Flag Change' =
+			SWITCH (
+			    TRUE (),
+			    [At Risk] = 1 && [At Risk Prior Week] = 0, "New",
+			    [At Risk] = 1 && [At Risk Prior Week] = 1, "Still flagged",
+			    [At Risk] = 0 && [At Risk Prior Week] = 1, "Cleared",
+			    "Clear"
+			)
+		displayFolder: Monday
+		lineageTag: af99a694-c0ff-4f58-922c-18213fe96cd7
+
+	measure 'New Flags' = COUNTROWS ( FILTER ( DimLearner, [Flag Change] = "New" ) )
+		formatString: #,0
+		displayFolder: Monday
+		lineageTag: deb9e235-7ab7-4e5d-becb-4b5d3bae6d52
+
+	measure 'Still Flagged' = COUNTROWS ( FILTER ( DimLearner, [Flag Change] = "Still flagged" ) )
+		formatString: #,0
+		displayFolder: Monday
+		lineageTag: cf5dc54f-1c07-40f6-be5e-7e363a9707a7
+
+	measure 'Cleared Flags' = COUNTROWS ( FILTER ( DimLearner, [Flag Change] = "Cleared" ) )
+		formatString: #,0
+		displayFolder: Monday
+		lineageTag: 6e21d0c7-e4aa-4a79-9454-82f13a1058c6
+
+	measure 'On Both Parts' =
+			VAR ThinAttendance = NOT ISBLANK ( [Attendance Rate] ) && [Attendance Rate] < [Attendance Bar]
+			VAR WeakMeans =
+			    ( NOT ISBLANK ( [Average Lab] ) && [Average Lab] < [Score Bar] )
+			        || ( NOT ISBLANK ( [Average Quiz] ) && [Average Quiz] < [Score Bar] )
+			VAR InScope = NOT ISBLANK ( [Expected Days] ) && [Expected Days] > 0
+			RETURN
+			    IF ( InScope && ThinAttendance && WeakMeans, 1, 0 )
+		formatString: 0
+		displayFolder: Monday
+		lineageTag: 6e2b9c14-8a47-4d15-b6c0-91f3a7e25c80
+
+	measure 'Low Score This Week' =
+			VAR LabScore = [Lab This Week]
+			VAR QuizScore = [Quiz This Week]
+			RETURN
+			    IF (
+			        ( NOT ISBLANK ( LabScore ) && LabScore < [Low Score Bar] )
+			            || ( NOT ISBLANK ( QuizScore ) && QuizScore < [Low Score Bar] ),
+			        1,
+			        0
+			    )
+		formatString: 0
+		displayFolder: Monday
+		lineageTag: 9a1d4f70-2c58-4e6b-a813-5d7c0b9e3f21
+
+	measure 'First Call Candidate' =
+			VAR AsOfWeekNumber = [As Of Week Number]
+			VAR ThinAttendance = NOT ISBLANK ( [Attendance Rate] ) && [Attendance Rate] < [Attendance Bar]
+			VAR WeakLab = NOT ISBLANK ( [Average Lab] ) && [Average Lab] < [Score Bar]
+			VAR WeakQuiz = NOT ISBLANK ( [Average Quiz] ) && [Average Quiz] < [Score Bar]
+			VAR InScope = NOT ISBLANK ( [Expected Days] ) && [Expected Days] > 0
+			RETURN
+			    IF (
+			        AsOfWeekNumber >= 4
+			            && InScope
+			            && ThinAttendance
+			            && ( WeakLab || WeakQuiz ),
+			        1,
+			        0
+			    )
+		formatString: 0
+		displayFolder: Monday
+		lineageTag: c4e8a1b2-6f30-4d9a-8c71-2b5e9a0d4f16
+
+	measure Severity =
+			IF (
+			    [At Risk] = 1 || [First Call Candidate] = 1,
+			    [Missed Assessments] + ( 1 - IF ( ISBLANK ( [Attendance Rate] ), 0, [Attendance Rate] ) ),
+			    BLANK ()
+			)
+		formatString: 0.00
+		displayFolder: Monday
+		lineageTag: 2719acdf-f104-4596-9382-a0cb736f735f
+
+	measure 'Call Rank' =
+			IF (
+			    [First Call Candidate] = 1,
+			    VAR CurrentEmail = MAX ( DimLearner[Email] )
+			    VAR RankRows =
+			        FILTER (
+			            ADDCOLUMNS (
+			                SUMMARIZE ( ALLSELECTED ( DimLearner ), DimLearner[Email] ),
+			                "@Score",
+			                    IF (
+			                        [First Call Candidate] = 1,
+			                        [Missed Assessments]
+			                            + ( 1 - IF ( ISBLANK ( [Attendance Rate] ), 0, [Attendance Rate] ) )
+			                            + DIVIDE (
+			                                RANKX (
+			                                    ALL ( DimLearner[Email] ),
+			                                    DimLearner[Email],
+			                                    MAX ( DimLearner[Email] ),
+			                                    ASC
+			                                ),
+			                                1000000
+			                            )
+			                    )
+			            ),
+			            NOT ISBLANK ( [@Score] )
+			        )
+			    VAR CurrentScore =
+			        MAXX ( FILTER ( RankRows, DimLearner[Email] = CurrentEmail ), [@Score] )
+			    RETURN
+			        RANKX ( RankRows, [@Score], CurrentScore, DESC, SKIP )
+			)
+		formatString: 0
+		displayFolder: Monday
+		lineageTag: 8b1c0a43-2fcc-40e4-afad-2fcc98ed314d
+
+	measure 'On First Call List' = IF ( [First Call Candidate] = 1, 1, 0 )
+		formatString: 0
+		displayFolder: Monday
+		lineageTag: 3fdb7d85-9cad-4636-8810-e870cdfdfa6b
+
+	measure 'Flag Shape' =
+			VAR ThinAttendance = NOT ISBLANK ( [Attendance Rate] ) && [Attendance Rate] < [Attendance Bar]
+			VAR WeakLab = NOT ISBLANK ( [Average Lab] ) && [Average Lab] < [Score Bar]
+			VAR WeakQuiz = NOT ISBLANK ( [Average Quiz] ) && [Average Quiz] < [Score Bar]
+			VAR InScope = NOT ISBLANK ( [Expected Days] ) && [Expected Days] > 0
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        InScope && ThinAttendance && ( WeakLab || WeakQuiz ), "Both",
+			        InScope && ThinAttendance, "Attendance",
+			        WeakLab && WeakQuiz, "Assessment",
+			        BLANK ()
+			    )
+		displayFolder: Monday
+		lineageTag: 15f1365d-f9a7-42de-acad-79813af46c11
+
+	measure 'Attended This Week' =
+			VAR AsOfWeekNumber = [As Of Week Number]
+			RETURN
+			    CALCULATE (
+			        DISTINCTCOUNT ( FactAttendance[ClassDate] ),
+			        FactAttendance[Attended] = TRUE (),
+			        FactAttendance[WeekNumber] = AsOfWeekNumber
+			    )
+		formatString: #,0
+		displayFolder: Monday
+		lineageTag: b6d62904-b937-4cde-b805-783c6eaf6d44
+
+	measure 'Participated This Week' =
+			VAR AsOfWeekNumber = [As Of Week Number]
+			RETURN
+			    CALCULATE (
+			        DISTINCTCOUNT ( FactParticipation[ClassDate] ),
+			        FactParticipation[WeekNumber] = AsOfWeekNumber
+			    )
+		formatString: #,0
+		displayFolder: Monday
+		lineageTag: ab814d66-88cd-49bd-a5d5-f30be8d2c74c
+
+	measure 'Attended And Participated' = COUNTROWS ( FILTER ( DimLearner, [Attended This Week] > 0 && [Participated This Week] > 0 ) )
+		formatString: #,0
+		displayFolder: Monday
+		lineageTag: c36ca629-dc92-4232-9183-0c99dcbc45d7
+
+	measure 'Attended Only' = COUNTROWS ( FILTER ( DimLearner, [Attended This Week] > 0 && [Participated This Week] = 0 ) )
+		formatString: #,0
+		displayFolder: Monday
+		lineageTag: 4e9ee35f-90e4-4298-9ab9-cf9b9cbdf3c1
+
+	measure 'Participated Only' = COUNTROWS ( FILTER ( DimLearner, [Attended This Week] = 0 && [Participated This Week] > 0 ) )
+		formatString: #,0
+		displayFolder: Monday
+		lineageTag: e70e59d3-ec1a-406f-8321-b5e545233879
+
+	measure 'Neither Attendance Nor Participation' = COUNTROWS ( FILTER ( DimLearner, [Attended This Week] = 0 && [Participated This Week] = 0 ) )
+		formatString: #,0
+		displayFolder: Monday
+		lineageTag: f62e90bf-258e-4ade-9f36-fc970a400c5c
+
+	measure 'Quiz This Week' =
+			VAR AsOfWeekNumber = [As Of Week Number]
+			RETURN
+			    CALCULATE (
+			        AVERAGE ( FactAssessment[Score] ),
+			        FactAssessment[Assessment] = "Quiz",
+			        FactAssessment[WeekNumber] = AsOfWeekNumber
+			    )
+		formatString: 0.0
+		displayFolder: Monday
+		lineageTag: ab2897e4-15ca-462f-8019-3b2770f3f332
+
+	measure 'Lab This Week' =
+			VAR AsOfWeekNumber = [As Of Week Number]
+			RETURN
+			    CALCULATE (
+			        AVERAGE ( FactAssessment[Score] ),
+			        FactAssessment[Assessment] = "Lab",
+			        FactAssessment[WeekNumber] = AsOfWeekNumber
+			    )
+		formatString: 0.0
+		displayFolder: Monday
+		lineageTag: 8d5f5658-c9ee-4223-ad1e-8c2261e21fb7
+
+	measure 'Share Below Quiz Bar' =
+			DIVIDE (
+			    COUNTROWS ( FILTER ( DimLearner, NOT ISBLANK ( [Quiz This Week] ) && [Quiz This Week] < [Score Bar] ) ),
+			    [Learners]
+			)
+		formatString: 0.0%
+		displayFolder: Monday
+		lineageTag: 953a6096-9404-481a-ba57-304f1f9ea8d9
+
+	measure 'Share Blank Lab' =
+			DIVIDE (
+			    COUNTROWS ( FILTER ( DimLearner, ISBLANK ( [Lab This Week] ) ) ),
+			    [Learners]
+			)
+		formatString: 0.0%
+		displayFolder: Monday
+		lineageTag: 05ad2167-dad5-428e-b6bc-8970dc32e302
+
+	measure 'Learner Track' =
+			LOOKUPVALUE (
+			    DimTrack[TrackName],
+			    DimTrack[TrackKey],
+			    SELECTEDVALUE ( DimLearner[TrackKey] )
+			)
+		displayFolder: Monday
+		lineageTag: 7c4e1a92-6b38-4f05-9d71-2e8a0c5b6d14
+
+	measure Engagement =
+			VAR AsOfWeekNumber = [As Of Week Number]
+			VAR EverAttended = [Days Attended]
+			VAR EarlyWeeks =
+			    CALCULATE (
+			        DISTINCTCOUNT ( FactAttendance[ClassDate] ),
+			        FactAttendance[Attended] = TRUE (),
+			        FactAttendance[WeekNumber] <= 2
+			    )
+			VAR ThisWeek =
+			    CALCULATE (
+			        DISTINCTCOUNT ( FactAttendance[ClassDate] ),
+			        FactAttendance[Attended] = TRUE (),
+			        FactAttendance[WeekNumber] = AsOfWeekNumber
+			    )
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        EverAttended = 0, "Never started",
+			        AsOfWeekNumber > 2 && EarlyWeeks > 0 && ThisWeek = 0, "Faded",
+			        "Active"
+			    )
+		displayFolder: Monday
+		lineageTag: ba9db98c-df2e-43e1-9025-9c37c3ddd57e
+
+	measure 'Learner Flag' =
+			IF (
+			    ISINSCOPE ( DimLearner[DisplayName] ),
+			    [At Risk],
+			    [At Risk Count]
+			)
+		formatString: #,0
+		displayFolder: Monday
+		lineageTag: b8d4f2e5-6c39-4011-9d27-3e0f1b5c8a42
+
+	measure 'Learner Flag Label' =
+			IF (
+			    NOT ISINSCOPE ( DimLearner[DisplayName] ),
+			    BLANK (),
+			    IF ( [At Risk] = 1, "Flagged", "None" )
+			)
+		displayFolder: Monday
+		lineageTag: c9e5a3b6-7d40-4122-ae38-4f1b2c6d9e53
+
+	measure 'Learner Flag Color' =
+			IF (
+			    NOT ISINSCOPE ( DimLearner[DisplayName] ),
+			    BLANK (),
+			    IF ( [At Risk] = 1, "#F6E4C4", "#D7EFE6" )
+			)
+		displayFolder: Monday
+		lineageTag: d0f6b4c7-8e51-4233-bf49-502c3d7e0f64
+
+	measure 'Learner Flag Ink' =
+			IF (
+			    NOT ISINSCOPE ( DimLearner[DisplayName] ),
+			    BLANK (),
+			    IF ( [At Risk] = 1, "#C4842A", "#1F7A6B" )
+			)
+		displayFolder: Monday
+		lineageTag: e1a7c5d8-9f62-4344-c05a-613d4e8f1075
+
+	measure 'Lab Ink' =
+			IF ( NOT ISBLANK ( [Average Lab] ) && [Average Lab] < [Score Bar], "#8C3A32", "#1C2430" )
+		displayFolder: Monday
+		lineageTag: f2b8d6e9-a073-4455-d16b-724e5f902186
+
+	measure 'Quiz Ink' =
+			IF ( NOT ISBLANK ( [Average Quiz] ) && [Average Quiz] < [Score Bar], "#8C3A32", "#1C2430" )
+		displayFolder: Monday
+		lineageTag: a3c9e7fa-b184-4566-e27c-835f60a13297
+
+	measure 'Unmatched Names' =
+			CALCULATE (
+			    COUNTROWS ( FactException ),
+			    FactException[Feed] = "Participation",
+			    FactException[Detail] = "Participation name matched no learner"
+			)
+		formatString: #,0
+		displayFolder: Monday
+		lineageTag: 46a4a95d-85f3-41c6-b024-7ab2f6a76ca6
+
+	measure 'Quiz Against Track' =
+			VAR AsOfWeekNumber = [As Of Week Number]
+			VAR TrackMedian =
+			    CALCULATE (
+			        MAX ( TrackWeek[MedianQuiz] ),
+			        TREATAS ( VALUES ( DimLearner[CohortKey] ), TrackWeek[CohortKey] ),
+			        TREATAS ( VALUES ( DimLearner[TrackKey] ), TrackWeek[TrackKey] ),
+			        TrackWeek[WeekNumber] = AsOfWeekNumber
+			    )
+			RETURN
+			    [Quiz This Week] - TrackMedian
+		formatString: 0.0
+		displayFolder: Monday
+		lineageTag: 261107d3-f739-4d79-85af-86bed2bda582
+
+	measure 'Attendance Rate Graduates' =
+			CALCULATE (
+			    [Attendance Rate],
+			    FILTER ( DimLearner, CALCULATE ( SELECTEDVALUE ( FactOutcome[Graduated] ) ) = TRUE () )
+			)
+		formatString: 0.0%
+		displayFolder: Retrospective
+		lineageTag: 4d17ceb0-7b6b-477a-8dec-964c42c8c74d
+
+	measure 'Attendance Rate Non-Graduates' =
+			CALCULATE (
+			    [Attendance Rate],
+			    FILTER ( DimLearner, CALCULATE ( SELECTEDVALUE ( FactOutcome[Graduated] ) ) = FALSE () )
+			)
+		formatString: 0.0%
+		displayFolder: Retrospective
+		lineageTag: 0d1b5533-c307-481c-a32f-bf14415ef9a9
+
+	measure 'Average Quiz Graduates' =
+			CALCULATE (
+			    [Average Quiz],
+			    FILTER ( DimLearner, CALCULATE ( SELECTEDVALUE ( FactOutcome[Graduated] ) ) = TRUE () )
+			)
+		formatString: 0.0
+		displayFolder: Retrospective
+		lineageTag: abeb01fb-7c9d-43b4-8a7c-6582a65dd372
+
+	measure 'Average Quiz Non-Graduates' =
+			CALCULATE (
+			    [Average Quiz],
+			    FILTER ( DimLearner, CALCULATE ( SELECTEDVALUE ( FactOutcome[Graduated] ) ) = FALSE () )
+			)
+		formatString: 0.0
+		displayFolder: Retrospective
+		lineageTag: 0bb405d3-95e3-4565-9c03-89e8dd10df51
+
+	measure 'Average Quiz Certified' =
+			CALCULATE (
+			    [Average Quiz],
+			    FILTER ( DimLearner, CALCULATE ( SELECTEDVALUE ( FactOutcome[Certified] ) ) = TRUE () )
+			)
+		formatString: 0.0
+		displayFolder: Retrospective
+		lineageTag: f2eb53a7-57de-45e7-9815-a13c63dae7f5
+
+	measure 'Average Quiz Graduated Not Certified' =
+			CALCULATE (
+			    [Average Quiz],
+			    FILTER (
+			        DimLearner,
+			        CALCULATE ( SELECTEDVALUE ( FactOutcome[Graduated] ) ) = TRUE ()
+			            && CALCULATE ( SELECTEDVALUE ( FactOutcome[Certified] ) ) = FALSE ()
+			    )
+			)
+		formatString: 0.0
+		displayFolder: Retrospective
+		lineageTag: 2c50c632-54ec-45ab-b287-6004ee915dbc
+
+	measure 'Graduated Not Certified' =
+			COUNTROWS (
+			    FILTER (
+			        DimLearner,
+			        CALCULATE ( SELECTEDVALUE ( FactOutcome[Graduated] ) ) = TRUE ()
+			            && CALCULATE ( SELECTEDVALUE ( FactOutcome[Certified] ) ) = FALSE ()
+			    )
+			)
+		formatString: #,0
+		displayFolder: Retrospective
+		lineageTag: 2afa263d-d704-4fb3-b880-939dd897a25a
+
+	measure 'Participation Rate Graduates' =
+			CALCULATE (
+			    [Participation Rate],
+			    FILTER ( DimLearner, CALCULATE ( SELECTEDVALUE ( FactOutcome[Graduated] ) ) = TRUE () )
+			)
+		formatString: 0.0%
+		displayFolder: Retrospective
+		lineageTag: 7e2a91c4-5b18-4d6e-a0f3-8c14d6e2b901
+
+	measure 'Participation Rate Non-Graduates' =
+			CALCULATE (
+			    [Participation Rate],
+			    FILTER ( DimLearner, CALCULATE ( SELECTEDVALUE ( FactOutcome[Graduated] ) ) = FALSE () )
+			)
+		formatString: 0.0%
+		displayFolder: Retrospective
+		lineageTag: 8f3b02d5-6c29-4e7f-b104-9d25e7f3c012
+
+	measure 'Participation Rate Certified' =
+			CALCULATE (
+			    [Participation Rate],
+			    FILTER (
+			        DimLearner,
+			        CALCULATE ( SELECTEDVALUE ( FactOutcome[Graduated] ) ) = TRUE ()
+			            && CALCULATE ( SELECTEDVALUE ( FactOutcome[Certified] ) ) = TRUE ()
+			    )
+			)
+		formatString: 0.0%
+		displayFolder: Retrospective
+		lineageTag: 904c13e6-7d3a-4f80-c215-ae36f804d123
+
+	measure 'Participation Rate Graduated Not Certified' =
+			CALCULATE (
+			    [Participation Rate],
+			    FILTER (
+			        DimLearner,
+			        CALCULATE ( SELECTEDVALUE ( FactOutcome[Graduated] ) ) = TRUE ()
+			            && CALCULATE ( SELECTEDVALUE ( FactOutcome[Certified] ) ) = FALSE ()
+			    )
+			)
+		formatString: 0.0%
+		displayFolder: Retrospective
+		lineageTag: a15d24f7-8e4b-4091-d326-bf470915e234
+
+	measure 'Attendance Flags' = COUNTROWS ( FILTER ( DimLearner, [Flag Shape] = "Attendance" ) )
+		formatString: #,0
+		displayFolder: Monday
+		lineageTag: 3954af32-9401-4419-9cfc-e298df0bc2cc
+
+	measure 'Assessment Flags' = COUNTROWS ( FILTER ( DimLearner, [Flag Shape] = "Assessment" ) )
+		formatString: #,0
+		displayFolder: Monday
+		lineageTag: 7b7bba63-d3c7-482d-b218-2ebf93c6286f
+
+	measure 'Both Flags' = COUNTROWS ( FILTER ( DimLearner, [Flag Shape] = "Both" ) )
+		formatString: #,0
+		displayFolder: Monday
+		lineageTag: 2cbb5d01-3c02-4213-a5fe-46e809d9bee7
+
+	measure 'Short Class In Scope' =
+			VAR AsOfWeekNumber = [As Of Week Number]
+			RETURN
+			    IF (
+			        SELECTEDVALUE ( ClassDay[ShortClass] ) = TRUE ()
+			            && SELECTEDVALUE ( ClassDay[WeekNumber] ) <= AsOfWeekNumber,
+			        1,
+			        0
+			    )
+		formatString: 0
+		displayFolder: Monday
+		lineageTag: 6940a871-2eb1-4393-af15-c9d8993aebc0
+
+	measure 'Class Day Track' =
+			LOOKUPVALUE (
+			    DimTrack[TrackName],
+			    DimTrack[TrackKey],
+			    SELECTEDVALUE ( ClassDay[TrackKey] )
+			)
+		displayFolder: Monday
+		lineageTag: 12c41737-343d-4892-b695-ee0b2a323b76
+
+	measure 'Story Days Attended' =
+			VAR RowWeek = SELECTEDVALUE ( WeekWindow[WeekNumber] )
+			RETURN
+			    CALCULATE (
+			        DISTINCTCOUNT ( FactAttendance[ClassDate] ),
+			        FactAttendance[Attended] = TRUE (),
+			        FactAttendance[WeekNumber] = RowWeek
+			    )
+		formatString: #,0
+		displayFolder: Learner story
+		lineageTag: 1a2b3c4d-5e6f-4708-91a2-b3c4d5e6f708
+
+	measure 'Story Expected Days' =
+			VAR RowWeek = SELECTEDVALUE ( WeekWindow[WeekNumber] )
+			RETURN
+			    CALCULATE (
+			        DISTINCTCOUNT ( ClassDay[ClassDate] ),
+			        TREATAS ( VALUES ( DimLearner[CohortKey] ), ClassDay[CohortKey] ),
+			        TREATAS ( VALUES ( DimLearner[TrackKey] ), ClassDay[TrackKey] ),
+			        ClassDay[WeekNumber] = RowWeek,
+			        REMOVEFILTERS ( DimLearner[Email] ),
+			        REMOVEFILTERS ( DimLearner[DisplayName] ),
+			        REMOVEFILTERS ( DimLearner[NameKey] )
+			    )
+		formatString: #,0
+		displayFolder: Learner story
+		lineageTag: 2b3c4d5e-6f70-4819-a2b3-c4d5e6f70819
+
+	measure 'Story Days Participated' =
+			VAR RowWeek = SELECTEDVALUE ( WeekWindow[WeekNumber] )
+			RETURN
+			    CALCULATE (
+			        DISTINCTCOUNT ( FactParticipation[ClassDate] ),
+			        FactParticipation[WeekNumber] = RowWeek
+			    )
+		formatString: #,0
+		displayFolder: Learner story
+		lineageTag: 3c4d5e6f-7081-492a-b3c4-d5e6f708192a
+
+	measure 'Story Average Lab' =
+			VAR RowWeek = SELECTEDVALUE ( WeekWindow[WeekNumber] )
+			RETURN
+			    CALCULATE (
+			        AVERAGE ( FactAssessment[Score] ),
+			        FactAssessment[Assessment] = "Lab",
+			        FactAssessment[WeekNumber] = RowWeek
+			    )
+		formatString: 0.0
+		displayFolder: Learner story
+		lineageTag: 4d5e6f70-8192-4a3b-c4d5-e6f708192a3b
+
+	measure 'Story Average Quiz' =
+			VAR RowWeek = SELECTEDVALUE ( WeekWindow[WeekNumber] )
+			RETURN
+			    CALCULATE (
+			        AVERAGE ( FactAssessment[Score] ),
+			        FactAssessment[Assessment] = "Quiz",
+			        FactAssessment[WeekNumber] = RowWeek
+			    )
+		formatString: 0.0
+		displayFolder: Learner story
+		lineageTag: 5e6f7081-92a3-4b4c-d5e6-f708192a3b4c
+
+	measure 'Story Track Quiz' =
+			VAR StoryWeek = SELECTEDVALUE ( WeekWindow[WeekNumber] )
+			RETURN
+			    IF (
+			        ISBLANK ( StoryWeek ),
+			        BLANK (),
+			        CALCULATE (
+			            MAX ( TrackWeek[MedianQuiz] ),
+			            TREATAS ( VALUES ( DimLearner[CohortKey] ), TrackWeek[CohortKey] ),
+			            TREATAS ( VALUES ( DimLearner[TrackKey] ), TrackWeek[TrackKey] ),
+			            TrackWeek[WeekNumber] = StoryWeek
+			        )
+			    )
+		formatString: 0.0
+		displayFolder: Learner story
+		lineageTag: f7a1c2d3-4e56-4789-a012-b3c4d5e6f789
+
+	measure 'Story At Risk' =
+			VAR StoryWeek = SELECTEDVALUE ( WeekWindow[WeekNumber] )
+			VAR AsOf = [As Of Week Number]
+			RETURN
+			    IF (
+			        ISBLANK ( StoryWeek ) || StoryWeek > AsOf,
+			        BLANK (),
+			        CALCULATE (
+			            [At Risk],
+			            AsOfWeek[WeekNumber] = StoryWeek,
+			            REMOVEFILTERS ( DimWeek ),
+			            REMOVEFILTERS ( WeekWindow )
+			        )
+			    )
+		formatString: 0
+		displayFolder: Learner story
+		lineageTag: fe3d1d3c-66d8-498c-a423-51d2a0cb642e
+
+	measure 'Story Quiz Against Track' =
+			VAR StoryWeek = SELECTEDVALUE ( WeekWindow[WeekNumber] )
+			VAR AsOf = [As Of Week Number]
+			RETURN
+			    IF (
+			        ISBLANK ( StoryWeek ) || StoryWeek > AsOf,
+			        BLANK (),
+			        CALCULATE (
+			            [Quiz Against Track],
+			            AsOfWeek[WeekNumber] = StoryWeek,
+			            REMOVEFILTERS ( DimWeek ),
+			            REMOVEFILTERS ( WeekWindow )
+			        )
+			    )
+		formatString: 0.0
+		displayFolder: Learner story
+		lineageTag: 022ca81b-bdde-45a8-a045-8638f90dea36
+
+	measure 'Story Flag Label' =
+			VAR Flag = [Story At Risk]
+			RETURN
+			    IF (
+			        ISBLANK ( Flag ),
+			        BLANK (),
+			        IF ( Flag = 1, "Flagged", "None" )
+			    )
+		displayFolder: Learner story
+		lineageTag: c3a8e1d4-7b52-4e16-9f20-6d4a1c8b5e77
+
+	measure 'Story Flag Color' =
+			VAR Flag = [Story At Risk]
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        ISBLANK ( Flag ), BLANK (),
+			        Flag = 1, "#F6E4C4",
+			        "#D7EFE6"
+			    )
+		displayFolder: Learner story
+		lineageTag: d4b9f2e5-8c63-4f27-a031-7e5b2d9c6f88
+
+	measure 'Story Flag Ink' =
+			VAR Flag = [Story At Risk]
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        ISBLANK ( Flag ), BLANK (),
+			        Flag = 1, "#C4842A",
+			        "#1F7A6B"
+			    )
+		displayFolder: Learner story
+		lineageTag: e5c0b3f6-9d74-4038-b142-8f6c3e0d70aa
+
+	measure 'Flagged Weeks' =
+			SUMX (
+			    WeekWindow,
+			    VAR StoryWeek = WeekWindow[WeekNumber]
+			    VAR AsOf = [As Of Week Number]
+			    RETURN
+			        IF (
+			            ISBLANK ( StoryWeek ) || StoryWeek > AsOf,
+			            BLANK (),
+			            CALCULATE (
+			                [At Risk],
+			                AsOfWeek[WeekNumber] = StoryWeek,
+			                REMOVEFILTERS ( DimWeek ),
+			                REMOVEFILTERS ( WeekWindow )
+			            )
+			        )
+			)
+		formatString: #,0
+		displayFolder: Learner story
+		lineageTag: e5c0a3f6-9d74-4038-b142-8f6c3e0d7099
+
+	measure 'Calls That Failed' =
+			COUNTROWS (
+			    FILTER (
+			        DimLearner,
+			        [First Call Candidate] = 1
+			            && CALCULATE ( SELECTEDVALUE ( FactOutcome[Graduated] ) ) = FALSE ()
+			    )
+			)
+		formatString: #,0
+		displayFolder: Trust
+		lineageTag: 4c1a8e20-6b37-4d15-9f44-1a2b3c4d5e61
+
+	measure 'Calls Missed' = [Non-Graduates] - [Calls That Failed]
+		formatString: #,0
+		displayFolder: Trust
+		lineageTag: 5d2b9f31-7c48-4e26-a055-2b3c4d5e6f72
+
+	measure 'Afternoons On Graduates' = [To Call] - [Calls That Failed]
+		formatString: #,0
+		displayFolder: Trust
+		lineageTag: 6e3c0a42-8d59-4f37-b166-3c4d5e6f7083
+
+	measure 'Weeks On Call List' =
+			SUMX ( ALL ( AsOfWeek ), IF ( [First Call Candidate] = 1, 1, 0 ) )
+		formatString: #,0
+		displayFolder: Trust
+		lineageTag: 7f4d1b53-9e6a-4048-c277-4d5e6f708194
+
+	measure 'Ever Failed And Called' =
+			COUNTROWS (
+			    FILTER (
+			        DimLearner,
+			        CALCULATE ( SELECTEDVALUE ( FactOutcome[Graduated] ) ) = FALSE ()
+			            && [Weeks On Call List] > 0
+			    )
+			)
+		formatString: #,0
+		displayFolder: Trust
+		lineageTag: 805e2c64-af7b-4159-d388-5e6f7081a2a5
+
+	measure 'Never Called' =
+			IF (
+			    CALCULATE ( SELECTEDVALUE ( FactOutcome[Graduated] ) ) = FALSE ()
+			        && [Weeks On Call List] = 0,
+			    1,
+			    0
+			)
+		formatString: 0
+		displayFolder: Trust
+		lineageTag: 916f3d75-b08c-426a-e499-6f7081a2b3b6
+
+	measure 'Never Called Count' = COUNTROWS ( FILTER ( DimLearner, [Never Called] = 1 ) )
+		formatString: #,0
+		displayFolder: Trust
+		lineageTag: a2704e86-c19d-437b-f5aa-7081a2b3c4c7
+
+	measure 'On Exam List' =
+			IF (
+			    CALCULATE ( SELECTEDVALUE ( FactOutcome[Graduated] ) ) = TRUE ()
+			        && CALCULATE ( SELECTEDVALUE ( FactOutcome[Certified] ) ) = FALSE (),
+			    1,
+			    0
+			)
+		formatString: 0
+		displayFolder: Trust
+		lineageTag: b3815f97-d2ae-448c-a6bb-81a2b3c4d5d8
+
+	column _
+		dataType: string
+		isHidden
+		lineageTag: ab6f5285-f66f-4330-87ab-b57067efed95
+		sourceColumn: _
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows({{""}}, {"_"})
+				in
+				    Source

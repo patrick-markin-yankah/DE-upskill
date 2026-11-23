@@ -1,0 +1,48 @@
+table FactOutcome
+	lineageTag: ee58ad17-fea8-4b70-9307-860c31918375
+
+	column Email
+		dataType: string
+		isHidden
+		lineageTag: 8828d446-3b51-4f67-a602-46699155522e
+		sourceColumn: Email
+
+	column CohortKey
+		dataType: string
+		lineageTag: 890e7b0f-0201-484f-8270-4bdc9c2b5c31
+		sourceColumn: CohortKey
+
+	column TrackKey
+		dataType: string
+		lineageTag: e44649a3-b109-409e-aaa9-91d4fea4bf7c
+		sourceColumn: TrackKey
+
+	column GraduationStatus
+		dataType: string
+		lineageTag: 216d35fa-c6a9-4aa9-aa13-4b7d6ee4b7cb
+		sourceColumn: GraduationStatus
+
+	column CertificationStatus
+		dataType: string
+		lineageTag: be84b914-83cf-41ed-822a-0e63e651c612
+		sourceColumn: CertificationStatus
+
+	column Graduated
+		dataType: boolean
+		lineageTag: ceef6bcd-7003-4062-9ab2-2c06359e9d4c
+		sourceColumn: Graduated
+
+	column Certified
+		dataType: boolean
+		lineageTag: 83e000fb-93b5-4a48-a22f-b27501355d1e
+		sourceColumn: Certified
+
+	partition FactOutcome = m
+		mode: import
+		source =
+				let
+				    Rows = Table.SelectRows(StatusRaw, each [Email] <> null),
+				    Keep = Table.SelectColumns(Rows, {"Email", "CohortKey", "TrackKey", "GraduationStatus", "CertificationStatus", "Graduated", "Certified"}),
+				    Distinct = Table.Distinct(Keep, {"Email"})
+				in
+				    Distinct

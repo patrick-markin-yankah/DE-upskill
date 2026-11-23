@@ -33,7 +33,8 @@ sk2-capstone/
 │   ├── optimization.md
 │   └── quality_report.md
 ├── scripts/
-│   └── run_pipeline.sh     # full rebuild orchestrator
+│   ├── run_pipeline.ps1    # Windows PowerShell orchestrator
+│   └── run_pipeline.sh     # bash orchestrator (macOS / Linux)
 └── sql/
     ├── 00_schemas.sql      # dw, staging, etl
     ├── 01_oltp.sql         # source + full-volume seed
@@ -51,7 +52,25 @@ Requires local PostgreSQL (same as the FreshMart lab). See [`../sk2-lab/connecti
 
 ### Orchestrator (recommended)
 
-From `sk2-capstone/`:
+From `sk2-capstone/`.
+
+Windows (PowerShell):
+
+```powershell
+# Wipe project schemas (dw / staging / etl / public) and run sql/00 → sql/07
+.\scripts\run_pipeline.ps1
+
+# Stronger wipe: DROP + CREATE the medinsure database, then full rebuild
+.\scripts\run_pipeline.ps1 -Reset
+
+# Skip the interactive "type yes" confirmation
+.\scripts\run_pipeline.ps1 -Yes
+.\scripts\run_pipeline.ps1 -Reset -Yes
+```
+
+The script finds `psql` on `PATH`, or under `C:\Program Files\PostgreSQL\*\bin`. Set the password for the session before a non-interactive run: `$env:PGPASSWORD = '...'`.
+
+macOS / Linux (bash):
 
 ```bash
 # Wipe project schemas (dw / staging / etl / public) and run sql/00 → sql/07
@@ -86,8 +105,8 @@ psql -h localhost -p 5432 -U postgres -d medinsure -v ON_ERROR_STOP=1 -f sql/07_
 
 **Notes**
 
-- Default `./scripts/run_pipeline.sh` drops `dw` / `staging` / `etl` and resets `public`, then rebuilds from `00`–`07`. Use `-y` to skip the confirm prompt.
-- `--reset` drops the entire `medinsure` database (cleanest full wipe).
+- Default `.\scripts\run_pipeline.ps1` (Windows) or `./scripts/run_pipeline.sh` (bash) drops `dw` / `staging` / `etl` and resets `public`, then rebuilds from `00`–`07`. Use `-Yes` / `-y` to skip the confirm prompt.
+- `-Reset` / `--reset` drops the entire `medinsure` database (cleanest full wipe).
 - `03_etl_dims.sql` hard-fails on SCD one-current violations and logs to `etl.scd_current_violations` / `etl.job_failures`.
 - `04_etl_facts.sql` is incremental within a single load (high-water mark on `processed_date`). A full orchestrator run always reloads from an empty warehouse.
 - After a fact reload outside the full pipeline, refresh the monthly MV if needed:  
@@ -125,6 +144,7 @@ psql -h localhost -p 5432 -U postgres -d medinsure -c \
 
 | Date | Change |
 |---|---|
+| 2026-10-28 | Added `scripts/run_pipeline.ps1` (Windows PowerShell orchestrator; same wipe / `-Reset` / `00`–`07` flow) |
 | 2026-09-02 | Added `sql_review.md` (line-by-line walkthrough of every statement in `sql/00`–`sql/07`) |
 | 2026-09-02 | Added `review.md` (problem/plan + non-technical walkthrough of each SQL file) |
 | 2026-09-02 | Added `scripts/run_pipeline.sh` orchestrator (create DB / `--reset` wipe / run `00`–`07`) |

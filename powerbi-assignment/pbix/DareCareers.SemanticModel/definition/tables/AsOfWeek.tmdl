@@ -1,0 +1,16 @@
+table AsOfWeek
+	lineageTag: 6db81ae9-e205-4db6-84ab-a70d56380edd
+
+	column WeekNumber
+		dataType: int64
+		lineageTag: 37af6266-25ba-4114-a44e-e58fe961e3b3
+		sourceColumn: WeekNumber
+
+	partition AsOfWeek = m
+		mode: import
+		source =
+				let
+				    Weeks = Table.Distinct(Table.SelectColumns(DimWeek, {"WeekNumber"})),
+				    Sorted = Table.Sort(Weeks, {{"WeekNumber", Order.Ascending}})
+				in
+				    Sorted

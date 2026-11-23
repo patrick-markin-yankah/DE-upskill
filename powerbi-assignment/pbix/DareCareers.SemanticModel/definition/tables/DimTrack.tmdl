@@ -1,0 +1,23 @@
+table DimTrack
+	lineageTag: eaa5616f-fcd3-407c-ae03-f7523507b477
+
+	column TrackKey
+		dataType: string
+		isUnique
+		isKey
+		lineageTag: 34ec47db-63b6-4ca3-9bb0-7ce62a2cb3af
+		sourceColumn: TrackKey
+
+	column TrackName
+		dataType: string
+		lineageTag: acb870ce-d92b-4fdf-9c73-106e615013f5
+		sourceColumn: TrackName
+
+	partition DimTrack = m
+		mode: import
+		source =
+				let
+				    Rows = Table.Distinct(Table.SelectColumns(FileIndex, {"TrackKey", "TrackName"})),
+				    Keep = Table.SelectRows(Rows, each [TrackKey] <> null)
+				in
+				    Keep

@@ -1,0 +1,70 @@
+table FactParticipation
+	lineageTag: 4d37dc26-90fb-4c89-ae67-ea385a380cc3
+
+	column Email
+		dataType: string
+		isHidden
+		lineageTag: 33d94729-940d-4a77-8f8c-b39007459fcc
+		sourceColumn: Email
+
+	column CohortKey
+		dataType: string
+		lineageTag: 33afb92d-35a8-4b27-9522-b361c5a51016
+		sourceColumn: CohortKey
+
+	column TrackKey
+		dataType: string
+		lineageTag: eb578ff5-51b6-471b-938a-753e987e249b
+		sourceColumn: TrackKey
+
+	column ClassDate
+		dataType: dateTime
+		lineageTag: 2eced778-ce38-4185-9ae4-f288509f3c8f
+		sourceColumn: ClassDate
+
+	column WeekNumber
+		dataType: int64
+		lineageTag: 51562346-d4e4-438c-b9a9-2972e74fc887
+		sourceColumn: WeekNumber
+
+	column WeekKey
+		dataType: string
+		lineageTag: ce98d5e9-e704-45f6-b38b-3a8eeb571ee4
+		sourceColumn: WeekKey
+
+	column DisplayName
+		dataType: string
+		lineageTag: 1f098d74-5c0c-414b-a23d-30de0cce1f2d
+		sourceColumn: DisplayName
+
+	partition FactParticipation = m
+		mode: import
+		source =
+				let
+				    Keys = Table.Group(
+				        Table.SelectRows(DimLearner, each [NameKey] <> null),
+				        {"CohortKey", "TrackKey", "NameKey"},
+				        {
+				            {"MatchCount", each Table.RowCount(_), Int64.Type},
+				            {"Email", each if Table.RowCount(_) = 1 then _{0}[Email] else null, type text}
+				        }),
+				    Joined = Table.NestedJoin(
+				        ParticipationLong,
+				        {"CohortKey", "TrackKey", "NameKey"},
+				        Keys,
+				        {"CohortKey", "TrackKey", "NameKey"},
+				        "Match",
+				        JoinKind.LeftOuter),
+				    Expanded = Table.ExpandTableColumn(Joined, "Match", {"MatchCount", "Email"}),
+				    One = Table.SelectRows(Expanded, each [MatchCount] = 1 and [ClassDateParsed] <> null),
+				    Days = Table.NestedJoin(One, {"CohortKey", "TrackKey", "ClassDateParsed"}, ClassDay, {"CohortKey", "TrackKey", "ClassDate"}, "Day", JoinKind.LeftOuter),
+				    WithWeek = Table.ExpandTableColumn(Days, "Day", {"WeekNumber", "WeekKey"}),
+				    Keep = Table.Distinct(Table.SelectColumns(
+				        Table.RenameColumns(WithWeek, {{"ClassDateParsed", "ClassDate"}, {"participants", "DisplayName"}}),
+				        {"Email", "CohortKey", "TrackKey", "ClassDate", "WeekNumber", "WeekKey", "DisplayName"})),
+				    Typed = Table.TransformColumns(Keep, {
+				        {"ClassDate", each if _ = null then null else DateTime.From(_), type datetime},
+				        {"WeekNumber", each if _ = null then null else Int64.From(_), Int64.Type}
+				    })
+				in
+				    Typed

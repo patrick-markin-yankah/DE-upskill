@@ -1,0 +1,70 @@
+table TrackWeek
+	isHidden
+	lineageTag: 6e8f22e1-cb5e-46a4-b1f3-12c8396ebdc4
+
+	column CohortKey
+		dataType: string
+		lineageTag: 2d62ba8e-1b6b-4da2-ae15-d151dba62ec5
+		sourceColumn: CohortKey
+
+	column TrackKey
+		dataType: string
+		lineageTag: 4d21471e-86f1-4bee-9e71-75102ce6d8c4
+		sourceColumn: TrackKey
+
+	column WeekNumber
+		dataType: int64
+		lineageTag: 24283029-c652-4f80-9253-6691388e50b4
+		sourceColumn: WeekNumber
+
+	column WeekKey
+		dataType: string
+		lineageTag: 13c32d56-1051-4b93-8158-1a3c46e0b2f1
+		sourceColumn: WeekKey
+
+	column MedianAttendance
+		dataType: double
+		lineageTag: 5416c85e-b170-4c74-976c-f31c18bb1150
+		sourceColumn: MedianAttendance
+
+	column MedianQuiz
+		dataType: double
+		lineageTag: 228cdfd5-5c74-4054-8ee0-389904031736
+		sourceColumn: MedianQuiz
+
+	column MedianLab
+		dataType: double
+		lineageTag: 17e57d08-7f3b-4848-b0dc-b1f903b74b08
+		sourceColumn: MedianLab
+
+	partition TrackWeek = m
+		mode: import
+		source =
+				let
+				    Weeks = Table.Distinct(Table.SelectColumns(ClassDay, {"CohortKey", "TrackKey", "WeekNumber", "WeekKey"})),
+				    Learners = Table.SelectColumns(DimLearner, {"Email", "CohortKey", "TrackKey"}),
+				    Spine = Table.NestedJoin(Learners, {"CohortKey", "TrackKey"}, Weeks, {"CohortKey", "TrackKey"}, "W", JoinKind.Inner),
+				    Expanded = Table.ExpandTableColumn(Spine, "W", {"WeekNumber", "WeekKey"}),
+				    Expected = Table.Group(ClassDay, {"CohortKey", "TrackKey", "WeekNumber"}, {{"Expected", each Table.RowCount(_), Int64.Type}}),
+				    Attended = Table.Group(
+				        Table.SelectRows(FactAttendance, each [Attended] = true),
+				        {"Email", "CohortKey", "TrackKey", "WeekNumber"},
+				        {{"AttendedDays", each Table.RowCount(_), Int64.Type}}),
+				    WithExp = Table.NestedJoin(Expanded, {"CohortKey", "TrackKey", "WeekNumber"}, Expected, {"CohortKey", "TrackKey", "WeekNumber"}, "E", JoinKind.LeftOuter),
+				    Exp2 = Table.ExpandTableColumn(WithExp, "E", {"Expected"}),
+				    WithAtt = Table.NestedJoin(Exp2, {"Email", "CohortKey", "TrackKey", "WeekNumber"}, Attended, {"Email", "CohortKey", "TrackKey", "WeekNumber"}, "A", JoinKind.LeftOuter),
+				    Att2 = Table.ExpandTableColumn(WithAtt, "A", {"AttendedDays"}),
+				    Rate = Table.AddColumn(Att2, "AttendanceRate", each
+				        if [Expected] = null or [Expected] = 0 then null
+				        else (if [AttendedDays] = null then 0 else [AttendedDays]) / [Expected], type number),
+				    MedAtt = Table.Group(Rate, {"CohortKey", "TrackKey", "WeekNumber", "WeekKey"}, {{"MedianAttendance", each List.Median([AttendanceRate]), type number}}),
+				    Quiz = Table.SelectRows(FactAssessment, each [Assessment] = "Quiz" and [Score] <> null),
+				    MedQuiz = Table.Group(Quiz, {"CohortKey", "TrackKey", "WeekNumber"}, {{"MedianQuiz", each List.Median([Score]), type number}}),
+				    Lab = Table.SelectRows(FactAssessment, each [Assessment] = "Lab" and [Score] <> null),
+				    MedLab = Table.Group(Lab, {"CohortKey", "TrackKey", "WeekNumber"}, {{"MedianLab", each List.Median([Score]), type number}}),
+				    JoinQ = Table.NestedJoin(MedAtt, {"CohortKey", "TrackKey", "WeekNumber"}, MedQuiz, {"CohortKey", "TrackKey", "WeekNumber"}, "Q", JoinKind.LeftOuter),
+				    ExpQ = Table.ExpandTableColumn(JoinQ, "Q", {"MedianQuiz"}),
+				    JoinL = Table.NestedJoin(ExpQ, {"CohortKey", "TrackKey", "WeekNumber"}, MedLab, {"CohortKey", "TrackKey", "WeekNumber"}, "L", JoinKind.LeftOuter),
+				    Done = Table.ExpandTableColumn(JoinL, "L", {"MedianLab"})
+				in
+				    Done

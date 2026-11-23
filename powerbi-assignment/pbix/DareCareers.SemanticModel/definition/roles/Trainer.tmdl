@@ -1,0 +1,39 @@
+role Trainer
+	modelPermission: read
+
+	tablePermission DimLearner =
+			VAR SignedIn = USERPRINCIPALNAME ()
+			RETURN
+			    COUNTROWS (
+			        FILTER (
+			            SecurityUsers,
+			            SecurityUsers[UserEmail] = SignedIn
+			                && SecurityUsers[Role] = "Trainer"
+			                && SecurityUsers[CohortKey] = DimLearner[CohortKey]
+			                && SecurityUsers[TrackKey] = DimLearner[TrackKey]
+			        )
+			    ) > 0
+
+	tablePermission DimCohort =
+			VAR SignedIn = USERPRINCIPALNAME ()
+			RETURN
+			    COUNTROWS (
+			        FILTER (
+			            SecurityUsers,
+			            SecurityUsers[UserEmail] = SignedIn
+			                && SecurityUsers[Role] = "Trainer"
+			                && SecurityUsers[CohortKey] = DimCohort[CohortKey]
+			        )
+			    ) > 0
+
+	tablePermission DimTrack =
+			VAR SignedIn = USERPRINCIPALNAME ()
+			RETURN
+			    COUNTROWS (
+			        FILTER (
+			            SecurityUsers,
+			            SecurityUsers[UserEmail] = SignedIn
+			                && SecurityUsers[Role] = "Trainer"
+			                && SecurityUsers[TrackKey] = DimTrack[TrackKey]
+			        )
+			    ) > 0

@@ -1,0 +1,70 @@
+table DimLearner
+	lineageTag: a640e1fc-89eb-4a46-8bd9-6fabfbc1558c
+
+	column Email
+		dataType: string
+		isUnique
+		isKey
+		lineageTag: 1224640f-28f1-440a-a76f-f5b10c463814
+		sourceColumn: Email
+
+	column DisplayName
+		dataType: string
+		lineageTag: 55c1c9c1-d3fc-45e8-b28e-53b4ee908971
+		sourceColumn: DisplayName
+
+	column NameKey
+		dataType: string
+		isHidden
+		lineageTag: 5a4a423c-3f9d-4434-90fc-1fef6737900c
+		sourceColumn: NameKey
+
+	column CohortKey
+		dataType: string
+		isHidden
+		lineageTag: 395f2c0c-3bf0-47d8-bea6-71f4d266abc7
+		sourceColumn: CohortKey
+
+	column TrackKey
+		dataType: string
+		isHidden
+		lineageTag: 8aaf763a-30c6-4f1b-a8ba-a6a2edfbf53a
+		sourceColumn: TrackKey
+
+	column TrackName = RELATED ( DimTrack[TrackName] )
+		dataType: string
+		lineageTag: 9f3c2a71-4e18-4b6d-8c05-1a7e6d0b4f22
+		summarizeBy: none
+
+	partition DimLearner = m
+		mode: import
+		source =
+				let
+				    FromZoom = Table.Group(
+				        Table.SelectRows(ZoomSessions, each [Email] <> null),
+				        {"Email"},
+				        {{"DisplayName", each List.First(List.RemoveNulls([DisplayName])), type text}}),
+				    Emails = Table.Distinct(Table.FromList(
+				        List.Distinct(List.Combine({
+				            FromZoom[Email],
+				            FactAssessment[Email],
+				            FactOutcome[Email]
+				        })),
+				        Splitter.SplitByNothing(),
+				        {"Email"})),
+				    Named = Table.NestedJoin(Emails, {"Email"}, FromZoom, {"Email"}, "Z", JoinKind.LeftOuter),
+				    ExpandName = Table.ExpandTableColumn(Named, "Z", {"DisplayName"}),
+				    Home = Table.Distinct(Table.SelectColumns(
+				        Table.SelectRows(ZoomSessions, each [Email] <> null),
+				        {"Email", "CohortKey", "TrackKey"})),
+				    FromAssess = Table.Distinct(Table.SelectColumns(FactAssessment, {"Email", "CohortKey", "TrackKey"})),
+				    FromStatus = Table.Distinct(Table.SelectColumns(FactOutcome, {"Email", "CohortKey", "TrackKey"})),
+				    Pairs = Table.Distinct(Table.Combine({Home, FromAssess, FromStatus})),
+				    Counted = Table.Group(Pairs, {"Email"}, {{"PairCount", each Table.RowCount(_), Int64.Type}, {"CohortKey", each _{0}[CohortKey], type text}, {"TrackKey", each _{0}[TrackKey], type text}}),
+				    Single = Table.SelectRows(Counted, each [PairCount] = 1),
+				    Joined = Table.NestedJoin(Single, {"Email"}, ExpandName, {"Email"}, "N", JoinKind.LeftOuter),
+				    Expanded = Table.ExpandTableColumn(Joined, "N", {"DisplayName"}),
+				    Key = Table.AddColumn(Expanded, "NameKey", each fnCleanName([DisplayName]), type text),
+				    Keep = Table.SelectColumns(Key, {"Email", "DisplayName", "NameKey", "CohortKey", "TrackKey"})
+				in
+				    Keep

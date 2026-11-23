@@ -1,0 +1,56 @@
+table FactException
+	isHidden
+	lineageTag: 51240e31-bbc3-4cd8-b1e1-ece3cb011a71
+
+	column Feed
+		dataType: string
+		lineageTag: 42ab7c80-b094-4fb4-9991-370384a6f363
+		sourceColumn: Feed
+
+	column CohortKey
+		dataType: string
+		lineageTag: 6c8676b0-eb53-44e4-9c65-5edce73e7208
+		sourceColumn: CohortKey
+
+	column TrackKey
+		dataType: string
+		lineageTag: 3533be8a-667a-4d7c-9a5f-2ab5967b1a8f
+		sourceColumn: TrackKey
+
+	column ClassDate
+		dataType: dateTime
+		lineageTag: 90ef8ccb-bc05-4ad4-b43e-0566478f01ed
+		sourceColumn: ClassDate
+
+	column Email
+		dataType: string
+		lineageTag: 21f64a46-74b5-4336-afec-fe6da40bd710
+		sourceColumn: Email
+
+	column PersonName
+		dataType: string
+		lineageTag: 9e8e0e84-3f27-4d44-86cc-d5417e85c0dc
+		sourceColumn: PersonName
+
+	column Detail
+		dataType: string
+		lineageTag: 52bb166f-9c93-4a8a-8a53-286a47344e53
+		sourceColumn: Detail
+
+	column SourceFile
+		dataType: string
+		lineageTag: bdc0442d-6d53-43fd-b264-cf65aafb8819
+		sourceColumn: SourceFile
+
+	partition FactException = m
+		mode: import
+		source =
+				let
+				    Combined = Table.Combine({exAttendance, exAssessment, exStatus, exLearner, exParticipation}),
+				    Cols = {"Feed", "CohortKey", "TrackKey", "ClassDate", "Email", "PersonName", "Detail", "SourceFile"},
+				    Present = Table.SelectColumns(Combined, Cols, MissingField.UseNull),
+				    Typed = Table.TransformColumns(Present, {
+				        {"ClassDate", each if _ = null then null else DateTime.From(_), type datetime}
+				    })
+				in
+				    Typed

@@ -1,0 +1,88 @@
+table FactAttendance
+	lineageTag: eee7110c-c9df-40b5-b427-87d7e4b48402
+
+	column Email
+		dataType: string
+		isHidden
+		lineageTag: 72887111-e2c8-4452-aca1-4c3a0f22b324
+		sourceColumn: Email
+
+	column CohortKey
+		dataType: string
+		lineageTag: dbdeaca6-8b5a-4b79-a15f-7865669bdfed
+		sourceColumn: CohortKey
+
+	column TrackKey
+		dataType: string
+		lineageTag: 476af520-e33c-4380-8fac-b0fe3dc5cd63
+		sourceColumn: TrackKey
+
+	column ClassDate
+		dataType: dateTime
+		lineageTag: a39aa81a-e741-4faf-88df-4bae34a38932
+		sourceColumn: ClassDate
+
+	column WeekNumber
+		dataType: int64
+		lineageTag: dbe7ee94-f785-47ed-b07c-f19236fbf013
+		sourceColumn: WeekNumber
+
+	column WeekKey
+		dataType: string
+		lineageTag: a57f97ee-d28a-40df-bd3b-1c5e1ed77928
+		sourceColumn: WeekKey
+
+	column Minutes
+		dataType: double
+		lineageTag: 68dbc1cf-7984-4fe9-a88e-6b13ac151ec6
+		sourceColumn: Minutes
+
+	column SessionCount
+		dataType: int64
+		lineageTag: 6cbecc66-5948-4315-b1d5-d6281963634f
+		sourceColumn: SessionCount
+
+	column DisplayName
+		dataType: string
+		lineageTag: c9b788a9-8dc8-4502-9156-3a4703fd4aec
+		sourceColumn: DisplayName
+
+	column JoinTime
+		dataType: dateTime
+		lineageTag: b09ac982-8088-4c05-b57e-549fe7c1f5eb
+		sourceColumn: JoinTime
+
+	column LeaveTime
+		dataType: dateTime
+		lineageTag: 99f0e8a4-5c56-469f-8fed-ab18c15bf05d
+		sourceColumn: LeaveTime
+
+	column Attended
+		dataType: boolean
+		lineageTag: e091281b-b466-42d3-8c0d-0944e116757d
+		sourceColumn: Attended
+
+	partition FactAttendance = m
+		mode: import
+		source =
+				let
+				    Valid = Table.SelectRows(ZoomSessions, each [Email] <> null and [Minutes] <> null and [ClassDate] <> null and [WeekNumber] <> null),
+				    Grouped = Table.Group(
+				        Valid,
+				        {"Email", "CohortKey", "TrackKey", "ClassDate", "WeekNumber", "WeekKey"},
+				        {
+				            {"Minutes", each List.Sum([Minutes]), type number},
+				            {"SessionCount", each Table.RowCount(_), Int64.Type},
+				            {"DisplayName", each List.First(List.RemoveNulls([DisplayName])), type text},
+				            {"JoinTime", each List.Min(List.RemoveNulls([JoinTime])), type time},
+				            {"LeaveTime", each List.Max(List.RemoveNulls([LeaveTime])), type time}
+				        }),
+				    Flag = Table.AddColumn(Grouped, "Attended", each [Minutes] > 30, type logical),
+				    Typed = Table.TransformColumns(Flag, {
+				        {"ClassDate", each if _ = null then null else DateTime.From(_), type datetime},
+				        {"WeekNumber", each if _ = null then null else Int64.From(_), Int64.Type},
+				        {"JoinTime", each if _ = null then null else DateTime.From(_), type datetime},
+				        {"LeaveTime", each if _ = null then null else DateTime.From(_), type datetime}
+				    })
+				in
+				    Typed
